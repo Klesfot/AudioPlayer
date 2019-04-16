@@ -8,8 +8,9 @@ namespace AudioPlayer
 {
     class Player
     {
-        private int _maxVolume;
+        private int _maxVolume = 100, _minVolume = 0;
         private int _volume;
+
         public int Volume
         {
             get
@@ -26,13 +27,23 @@ namespace AudioPlayer
 
                 else if(value < 0)
                 {
-                    _volume = value;
+                    _volume = _minVolume;
                 }
 
                 else
                 {
                     _volume = value;
                 }
+            }
+        }
+
+        private bool playing;
+
+        public bool Playing
+        {
+            get
+            {
+                return playing;
             }
         }
 
@@ -49,6 +60,51 @@ namespace AudioPlayer
             }
         }
 
+        public bool Start()
+        {
+            if (IsLocked == false)
+            {
+                playing = true;
+                Console.WriteLine("Player has started");
+            }
+
+            else
+            {
+                Console.WriteLine("Player is locked, unlock first");
+            }
+
+            return playing;
+        }
+
+        public bool Stop()
+        {
+            if (IsLocked == false)
+            {
+                playing = false;
+                Console.WriteLine("Player has stopped");
+            }
+
+            else
+            {
+                Console.WriteLine("Player is locked, unlock first");
+
+            }
+
+            return playing;
+        }
+
+        public void Lock()
+        {
+            IsLocked = true;
+            Console.WriteLine("Player is locked");
+        }
+
+        public void Unlock()
+        {
+            IsLocked = false;
+            Console.WriteLine("Player is unlocked");
+        }
+
         public void VolumeUp()
         {
             Volume += 5;
@@ -59,6 +115,15 @@ namespace AudioPlayer
         {
             Volume -= 5;
             Console.WriteLine("Volume is: " + Volume);
+        }
+
+
+        public int VolumeChange(int amount)
+        {
+            Volume = amount;
+            Console.WriteLine("Volume is: " + Volume);
+
+            return 0;
         }
     }
 }

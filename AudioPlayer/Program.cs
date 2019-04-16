@@ -15,18 +15,20 @@ namespace AudioPlayer
             var player = new Player();
             var songs = CreateSongs(out min, out max, ref total);
             player.Songs = songs;
+
             Console.WriteLine($"Total duration: " + total + " max duration: " + max + " min duration: " + min);
+
             while (true)
             {
                 switch (ReadLine())
                 {
-                    case "Up":
+                    case "U":
                         {
                             player.VolumeUp();
                         }
                         break;
 
-                    case "Down":
+                    case "D":
                         {
                             player.VolumeDown();
                         }
@@ -35,6 +37,38 @@ namespace AudioPlayer
                     case "P":
                         {
                             player.Play();
+                        }
+                        break;
+
+                    case "Volume":
+                        {
+                            Console.WriteLine("Specify volume: ");
+                            int inputAmount = Convert.ToInt32(Console.ReadLine());
+                            player.VolumeChange(inputAmount);
+                        }
+                        break;
+
+                    case "Start":
+                        {
+                            player.Start();
+                        }
+                        break;
+
+                    case "Stop":
+                        {
+                            player.Stop();
+                        }
+                        break;
+
+                    case "Lock":
+                        {
+                            player.Lock();
+                        }
+                        break;
+
+                    case "Unlock":
+                        {
+                            player.Unlock();
                         }
                         break;
                 }
