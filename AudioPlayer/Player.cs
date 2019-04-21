@@ -117,13 +117,39 @@ namespace AudioPlayer
             Console.WriteLine("Volume is: " + Volume);
         }
 
-
         public int VolumeChange(int amount)
         {
             Volume = amount;
             Console.WriteLine("Volume is: " + Volume);
 
             return 0;
+        }
+
+        private void SongsParamsList(params string[] Songs)
+        {
+            Console.WriteLine(Songs);
+        }
+
+        public Song[] Add(Song song1)
+        {
+            Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration);
+            return null;
+        }
+
+        public Song[] Add(Song song1, Song song2)
+        {
+            Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration);
+            Console.WriteLine("Added song: " + " " + song2.Title + " " + song2.Artist.Name + " " + song2.Duration);
+            return null;
+        }
+
+        public Song[] Add(Song[] Songs)
+        {
+            for (int i = 0; i < Songs.Length; i++)
+            {
+                Console.WriteLine("Added song: " + " " + Songs[i].Title + " " + Songs[i].Artist.Name + " " + Songs[i].Duration);
+            }
+            return null;
         }
     }
 }
