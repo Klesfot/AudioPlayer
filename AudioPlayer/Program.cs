@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ namespace AudioPlayer
             int min, max, total = 0;
             var player = new Player();
             var songs = CreateSongs(out min, out max, ref total);
-            player.Songs = songs;
+            player.Add(songs);
 
             Console.WriteLine($"Total duration: " + total + " max duration: " + max + " min duration: " + min);
 
@@ -111,6 +112,7 @@ namespace AudioPlayer
             }
         }
 
+
         private static Song[] CreateSongs(out int min, out int max, ref int total)
         {
             Random rand = new Random();
@@ -136,6 +138,7 @@ namespace AudioPlayer
             return songs;
         }
 
+
 		private static Song CreateDefaultSong()
         {
             Random rand = new Random();
@@ -146,6 +149,7 @@ namespace AudioPlayer
             song1.Artist = new Artist(Convert.ToString(rand.Next(3001)));
             return song1;
         }
+
 
         private static Song CreateNamedSong(string name)
         {
@@ -158,6 +162,7 @@ namespace AudioPlayer
             return song2;
         }
 
+
         private static Song CreateSong(string name, string artistName, int duration)
         {
             Random rand = new Random();
@@ -169,6 +174,7 @@ namespace AudioPlayer
             return song3;
         }
 
+
         private static Artist AddArtist(string artistName = "Unknown artist", string artistNick = "N/A", string artistCountry = "N/A")
         {
             Artist artist1 = new Artist();
@@ -177,6 +183,7 @@ namespace AudioPlayer
             artist1.Country = artistCountry;
             return artist1;
         }
+
 
         private static Album AddAlbum(string albumName = "Unknown album", string albumYear = "-")
         {

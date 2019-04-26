@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,9 @@ using System.Threading.Tasks;
 namespace AudioPlayer
 {
     class Player
-    {
+    {   
+        public Playlist playlist = new Playlist();
+
         private int _maxVolume = 100, _minVolume = 0;
         private int _volume;
 
@@ -37,7 +40,7 @@ namespace AudioPlayer
             }
         }
 
-        private bool playing;
+        private bool playing = true;
 
         public bool Playing
         {
@@ -48,17 +51,23 @@ namespace AudioPlayer
         }
 
         bool IsLocked;
-        public Song[] Songs;
-
+        
 
         public void Play()
-        {
-            for (int i = 0; i < Songs.Length; i++)
+        {   
+            if (playing == true)
             {
-                Console.WriteLine(Songs[i].Title + " " + Songs[i].Artist.Name + " " + Songs[i].Duration);
-                System.Threading.Thread.Sleep(Songs[i].Duration);
+                for (int i = 0; i < playlist.Songs.Count; i++)
+                {
+                    Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                                                                            " " + playlist.Songs[i].Duration);
+                    System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                }
             }
+            else
+                Console.WriteLine("Player has not started, start it first");
         }
+
 
         public bool Start()
         {
@@ -75,6 +84,7 @@ namespace AudioPlayer
 
             return playing;
         }
+
 
         public bool Stop()
         {
@@ -93,11 +103,13 @@ namespace AudioPlayer
             return playing;
         }
 
+
         public void Lock()
         {
             IsLocked = true;
             Console.WriteLine("Player is locked");
         }
+
 
         public void Unlock()
         {
@@ -105,17 +117,20 @@ namespace AudioPlayer
             Console.WriteLine("Player is unlocked");
         }
 
+
         public void VolumeUp()
         {
             Volume += 5;
             Console.WriteLine("Volume is: " + Volume);
         }
 
+
         public void VolumeDown()
         {
             Volume -= 5;
             Console.WriteLine("Volume is: " + Volume);
         }
+
 
         public int VolumeChange(int amount)
         {
@@ -125,29 +140,37 @@ namespace AudioPlayer
             return 0;
         }
 
+
         private void SongsParamsList(params string[] Songs)
         {
             Console.WriteLine(Songs);
         }
 
-        public Song[] Add(Song song1)
+
+        public Song Add(Song song1)
         {
+            playlist.Songs.Add(song1);
             Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration);
             return null;
         }
 
+
         public Song[] Add(Song song1, Song song2)
         {
+            playlist.Songs.Add(song1);
+            playlist.Songs.Add(song2);
             Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration);
             Console.WriteLine("Added song: " + " " + song2.Title + " " + song2.Artist.Name + " " + song2.Duration);
             return null;
         }
 
-        public Song[] Add(Song[] Songs)
+
+        public Song[] Add(Song[] songs)
         {
-            for (int i = 0; i < Songs.Length; i++)
+            for (int i = 0; i < songs.Length; i++)
             {
-                Console.WriteLine("Added song: " + " " + Songs[i].Title + " " + Songs[i].Artist.Name + " " + Songs[i].Duration);
+                playlist.Songs.Add(songs[i]);
+                Console.WriteLine("Added song: " + " " + songs[i].Title + " " + songs[i].Artist.Name + " " + songs[i].Duration);
             }
             return null;
         }

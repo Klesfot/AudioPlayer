@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,6 @@ namespace AudioPlayer
     {
         string Path;
         string Title;
-        Song[] Songs;
+        public List<Song> Songs = new List<Song>();
     }
 }
