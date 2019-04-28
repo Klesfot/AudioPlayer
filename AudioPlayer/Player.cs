@@ -178,9 +178,9 @@ namespace AudioPlayer
         }
 
 
-        public Song[] Add(Song[] songs)
+        public void Add(List<Song> songs)
         {
-            for (int i = 0; i < songs.Length; i++)
+            for (int i = 0; i < songs.Capacity; i++)
             {
                 playlist.Songs.Add(songs[i]);
                 Console.WriteLine("Added song: " + " " + songs[i].Title + " " + songs[i].Artist.Name + " " + songs[i].Duration);

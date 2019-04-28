@@ -12,13 +12,12 @@ namespace AudioPlayer
     {
         static void Main(string[] args)
         {
-            int min, max, total = 0;
-            var songs = CreateSongs(out min, out max, ref total);   
+            int min, max, total = 0; 
 
-            //Song song2 = CreateNamedSong("Election");
+            Song song2 = CreateNamedSong("Election");
 
             Artist Artist3 = new Artist("Xi");
-            //Song song3 = CreateSong("Zauberkugel", Artist3.Name, 3000);
+            Song song3 = CreateSong("Zauberkugel", Artist3.Name, 3000);
             
             Artist Artist2 = AddArtist("Infected mushroom");
             Artist Artist1 = AddArtist();
@@ -102,7 +101,7 @@ namespace AudioPlayer
 
                     case "AddArr":
                     {
-                        //player.Add(songs);
+                        player.Add(songs);
                     }
                     break;
 
@@ -118,6 +117,7 @@ namespace AudioPlayer
                         sortList = player.SortByTitle(sortList);
                         player.playlist.Songs.Clear();
                         player.playlist.Songs = sortList;
+                        player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
                 }
