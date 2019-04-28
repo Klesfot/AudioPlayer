@@ -12,9 +12,21 @@ namespace AudioPlayer
         public string Title;
         string Path;
         string Lyrics;
-        string Genre;
+        public bool? IsLiked = null;
+        public int Genre;
 
         public Artist Artist;
         Album Album;
+
+        public void Like()
+        {
+            IsLiked = true;
+        }
+
+
+        public void Dislike()
+        {
+            IsLiked = false;
+        }
     }
 }

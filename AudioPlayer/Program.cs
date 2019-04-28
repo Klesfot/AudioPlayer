@@ -35,7 +35,6 @@ namespace AudioPlayer
             var songs = CreateSongs(out min, out max, ref total);
             var sortList = new List<Song>();
             sortList = songs;
-            //player.Add(songs);
 
             Console.WriteLine($"Total duration: " + total + " max duration: " + max + " min duration: " + min);
 
@@ -120,6 +119,32 @@ namespace AudioPlayer
                         player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
+
+                    case "+":
+                    {
+                        Console.WriteLine("Please specify the title of a song in current playlist that you wish to like");
+                        var input = Console.ReadLine();
+
+                        for (int i = 0; i < player.playlist.Songs.Count; i++)
+                        {
+                            if (player.playlist.Songs[i].Title == input)
+                                player.playlist.Songs[i].Like();
+                        }
+                    }
+                    break;
+
+                    case "-":
+                    {
+                        Console.WriteLine("Please specify the the title of a song in current playlist that you wish to like");
+                        var input = Console.ReadLine();
+
+                        for (int i = 0; i < player.playlist.Songs.Count; i++)
+                        {
+                            if (player.playlist.Songs[i].Title == input)
+                                player.playlist.Songs[i].Dislike();
+                        }
+                    }
+                    break;
                 }
             }
         }
@@ -137,6 +162,7 @@ namespace AudioPlayer
                 song1.Title = "Song" + i;
                 song1.Duration = rand.Next(3001);
                 song1.Artist = new Artist();
+                song1.Genre = rand.Next(5);
                 songs.Add(song1);
                 TotalDuration += song1.Duration;
                 MinDuration = song1.Duration < MinDuration ? song1.Duration : MinDuration;
