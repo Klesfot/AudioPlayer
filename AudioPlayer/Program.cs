@@ -12,11 +12,13 @@ namespace AudioPlayer
     {
         static void Main(string[] args)
         {
-            Song song1 = CreateDefaultSong();
-            Song song2 = CreateNamedSong("Election");
+            int min, max, total = 0;
+            var songs = CreateSongs(out min, out max, ref total);   
+
+            //Song song2 = CreateNamedSong("Election");
 
             Artist Artist3 = new Artist("Xi");
-            Song song3 = CreateSong("Zauberkugel", Artist3.Name, 3000);
+            //Song song3 = CreateSong("Zauberkugel", Artist3.Name, 3000);
             
             Artist Artist2 = AddArtist("Infected mushroom");
             Artist Artist1 = AddArtist();
@@ -30,7 +32,6 @@ namespace AudioPlayer
             Console.WriteLine("Album 2 is: " + " " + Album2.Name + " " + Album2.Year);
             Console.WriteLine("Album 3 is: " + " " + Album3.Name + " " + Album3.Year);
 
-            int min, max, total = 0;
             var player = new Player();
             var songs = CreateSongs(out min, out max, ref total);
             var sortList = new List<Song>();
@@ -99,21 +100,9 @@ namespace AudioPlayer
                     }
                     break;
 
-                    case "Add1":
-                    {
-                        player.Add(song1);
-                    }
-                    break;
-
-                    case "Add2":
-                    {
-                        player.Add(song3, song2);
-                    }
-                    break;
-
                     case "AddArr":
                     {
-                        player.Add(songs);
+                        //player.Add(songs);
                     }
                     break;
 
@@ -165,8 +154,8 @@ namespace AudioPlayer
 		private static Song CreateDefaultSong()
         {
             Random rand = new Random();
-
             var song1 = new Song();
+
             song1.Title = Convert.ToString(rand.Next(1000));
             song1.Duration = rand.Next(3001);
             song1.Artist = new Artist(Convert.ToString(rand.Next(3001)));

@@ -23,19 +23,13 @@ namespace AudioPlayer
             set
             {
                 if(value > _maxVolume)
-                {
                     _volume = _maxVolume;
-                }
 
                 else if(value < 0)
-                {
                     _volume = _minVolume;
-                }
 
                 else
-                {
                     _volume = value;
-                }
             }
         }
 
@@ -174,18 +168,19 @@ namespace AudioPlayer
         }
 
 
-        public void Add(Song song1, Song song2)
+        public Song[] Add(Song song1, Song song2)
         {
             playlist.Songs.Add(song1);
             playlist.Songs.Add(song2);
             Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration);
             Console.WriteLine("Added song: " + " " + song2.Title + " " + song2.Artist.Name + " " + song2.Duration);
+            return null;
         }
 
 
-        public void Add(List<Song> songs)
+        public Song[] Add(Song[] songs)
         {
-            for (int i = 0; i < songs.Count; i++)
+            for (int i = 0; i < songs.Length; i++)
             {
                 playlist.Songs.Add(songs[i]);
                 Console.WriteLine("Added song: " + " " + songs[i].Title + " " + songs[i].Artist.Name + " " + songs[i].Duration);
