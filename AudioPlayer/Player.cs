@@ -10,7 +10,6 @@ namespace AudioPlayer
     class Player
     {   
         public Playlist playlist = new Playlist();
-
         private int _maxVolume = 100, _minVolume = 0;
         private int _volume;
 
@@ -50,21 +49,42 @@ namespace AudioPlayer
             }
         }
 
-        bool IsLocked;
+        bool IsLocked, IsOnLoop;
         
 
-        public void Play()
+        public void Play(bool IsOnLoop = false)
         {   
             if (playing == true)
             {
-                for (int i = 0; i < playlist.Songs.Count; i++)
+                if (IsLocked == false)
                 {
-                    Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                    if (IsOnLoop == false)
+                    {
+                        for (int i = 0; i < playlist.Songs.Count; i++)
+                        {
+                            Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                                                                        " " + playlist.Songs[i].Duration);
+                            System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                        }
+                    }
+
+                    else
+                    {
+                        for (int l = 0; l < 5; l++)
+                        {
+                            for (int i = 0; i < playlist.Songs.Count; i++)
+                            {
+                                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
                                                                             " " + playlist.Songs[i].Duration);
-                    System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                            }
+                        }
+                    }
                 }
+                else
+                    Console.WriteLine("Player is locked, unlock it first");
             }
-            else
+            else if (playing == false)
                 Console.WriteLine("Player has not started, start it first");
         }
 
@@ -147,32 +167,75 @@ namespace AudioPlayer
         }
 
 
-        public Song Add(Song song1)
+        public void Add(Song song1)
         {
             playlist.Songs.Add(song1);
             Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration);
-            return null;
         }
 
 
-        public Song[] Add(Song song1, Song song2)
+        public void Add(Song song1, Song song2)
         {
             playlist.Songs.Add(song1);
             playlist.Songs.Add(song2);
             Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration);
             Console.WriteLine("Added song: " + " " + song2.Title + " " + song2.Artist.Name + " " + song2.Duration);
-            return null;
         }
 
 
-        public Song[] Add(Song[] songs)
+        public void Add(List<Song> songs)
         {
-            for (int i = 0; i < songs.Length; i++)
+            for (int i = 0; i < songs.Count; i++)
             {
                 playlist.Songs.Add(songs[i]);
                 Console.WriteLine("Added song: " + " " + songs[i].Title + " " + songs[i].Artist.Name + " " + songs[i].Duration);
             }
-            return null;
+        }
+
+
+        public void PrintPlaylist(List<Song> songs)
+        {
+            Console.WriteLine("Playlist contains following songs: ");
+            for (int i = 0; i < songs.Count; i++)
+                Console.WriteLine(songs[i].Artist.Name + " " + songs[i].Title + " " + songs[i].Duration);
+        }
+
+
+        Random rand = new Random();
+        public List<Song> Shuffle(List<Song> songs)
+        {
+            var newSongs = new List<Song>();
+
+            for (int i = songs.Count - 1; i >= 0; i--)
+            {
+                var r = rand.Next(i + 1);
+                var temp = songs[i];
+                songs[i] = songs[r];
+                songs[r] = temp;
+                newSongs.Add(songs[i]);
+            }
+            return newSongs;
+        }
+
+
+        public List<Song> SortByTitle(List<Song> songs)
+        {
+            var tempNameList = new List<String>();
+            var newSongList = new List<Song>();
+
+            for(int i = 0; i < songs.Count; i++)
+            {
+                tempNameList.Add(songs[i].Title);
+            }
+
+            tempNameList.Sort();
+
+            for(int i = 0; i < songs.Count; i++)
+            {
+                newSongList.Add(songs[i]);
+            }
+
+            return newSongList;
         }
     }
 }

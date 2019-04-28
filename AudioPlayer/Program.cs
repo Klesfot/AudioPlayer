@@ -33,7 +33,9 @@ namespace AudioPlayer
             int min, max, total = 0;
             var player = new Player();
             var songs = CreateSongs(out min, out max, ref total);
-            player.Add(songs);
+            var sortList = new List<Song>();
+            sortList = songs;
+            //player.Add(songs);
 
             Console.WriteLine($"Total duration: " + total + " max duration: " + max + " min duration: " + min);
 
@@ -50,6 +52,12 @@ namespace AudioPlayer
                     case "D":
                     {
                         player.VolumeDown();
+                    }
+                    break;
+
+                    case "Pt":
+                    {
+                        player.Play(true);
                     }
                     break;
 
@@ -108,24 +116,39 @@ namespace AudioPlayer
                         player.Add(songs);
                     }
                     break;
+
+                    case "Shuffle":
+                    {
+                        player.playlist.Songs = player.Shuffle(player.playlist.Songs);
+                        player.PrintPlaylist(player.playlist.Songs);
+                    }
+                    break;
+
+                    case "SortT":
+                    {
+                        sortList = player.SortByTitle(sortList);
+                        player.playlist.Songs.Clear();
+                        player.playlist.Songs = sortList;
+                    }
+                    break;
                 }
             }
         }
 
 
-        private static Song[] CreateSongs(out int min, out int max, ref int total)
+        private static List<Song> CreateSongs(out int min, out int max, ref int total)
         {
             Random rand = new Random();
-            Song[] songs = new Song[5];
+            List<Song> songs = new List<Song>(5);
             int MinDuration = int.MaxValue, MaxDuration = int.MinValue, TotalDuration = 0;
 
-            for (int i = 0; i < songs.Length; i++)
+            for (int i = 0; i < songs.Capacity; i++)
             {
                 var song1 = new Song();
                 song1.Title = "Song" + i;
                 song1.Duration = rand.Next(3001);
                 song1.Artist = new Artist();
-                songs[i] = song1;
+                songs.Add(song1);
                 TotalDuration += song1.Duration;
                 MinDuration = song1.Duration < MinDuration ? song1.Duration : MinDuration;
                 MaxDuration = song1.Duration > MaxDuration ? song1.Duration : MaxDuration;
