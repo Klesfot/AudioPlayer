@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AudioPlayer
 {
     class Player
-    {  
+    {
         public enum Genre : int
         {
             PsyTrance = 0,
@@ -68,28 +68,17 @@ namespace AudioPlayer
                             Genre genre = (Genre)playlist.Songs[i].Genre;
                             if (playlist.Songs[i].IsLiked == true)
                             {
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
-                                                                            " " + playlist.Songs[i].Duration +
-                                                                            " " + genre);
-                                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                                printSong(i, genre, "green");
                             }
 
                             else if (playlist.Songs[i].IsLiked == false)
                             {
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
-                                                                            " " + playlist.Songs[i].Duration + 
-                                                                            " " + genre);
-                                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                                printSong(i, genre, "red");
                             }
 
                             else
                             {
-                                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
-                                                                            " " + playlist.Songs[i].Duration + 
-                                                                            " " + genre);
-                                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                                printSong(i, genre);
                             }
                         }
                     }
@@ -102,29 +91,16 @@ namespace AudioPlayer
                             {
                                 Genre genre = (Genre)playlist.Songs[i].Genre;
                                 if (playlist.Songs[i].IsLiked == true)
-                                {
-                                    Console.ForegroundColor = ConsoleColor.Green;
-                                    Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
-                                                                                " " + playlist.Songs[i].Duration + 
-                                                                                " " + genre);
-                                    System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
-                                }
+                                    printSong(i, genre, "green");
 
                                 else if (playlist.Songs[i].IsLiked == false)
                                 {
-                                    Console.ForegroundColor = ConsoleColor.Red;
-                                    Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
-                                                                                " " + playlist.Songs[i].Duration +
-                                                                                " " + genre);
-                                    System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                                    printSong(i, genre, "red");
                                 }
 
                                 else
                                 {
-                                    Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
-                                                                                " " + playlist.Songs[i].Duration + 
-                                                                                " " + genre);
-                                    System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+                                    printSong(i, genre);
                                 }
                             }
                         }
@@ -279,21 +255,47 @@ namespace AudioPlayer
         public List<Song> SortByTitle(List<Song> songs)
         {
             var tempNameList = new List<String>();
-            var newSongList = new List<Song>();
-
-            for(int i = 0; i < songs.Count; i++)
-            {
-                tempNameList.Add(songs[i].Title);
-            }
-
-            tempNameList.Sort();
-
-            for(int i = 0; i < songs.Count; i++)
-            {
-                newSongList.Add(songs[i]);
-            }
+            List<Song> newSongList = songs.OrderBy(o=>o.Title).ToList();
 
             return newSongList;
+        }
+
+
+        public List<Song> SortByGenre(List<Song> songs)
+        {
+            var tempNameList = new List<String>();
+            List<Song> newSongList = songs.OrderBy(o=>(int)o.Genre).ToList();
+
+            return newSongList;
+        }
+
+
+        public void printSong(int i, Genre genre, string color = "white")
+        {
+            if (color == "green")
+            {    
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                                                            " " + playlist.Songs[i].Duration +
+                                                            " " + genre);
+                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+            }
+            else if (color == "red")
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                                                            " " + playlist.Songs[i].Duration +
+                                                            " " + genre);
+                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+            }
+            else
+            {
+                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                                                            " " + playlist.Songs[i].Duration +
+                                                            " " + genre);
+                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
+            }
+                
         }
     }
 }

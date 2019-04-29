@@ -33,8 +33,6 @@ namespace AudioPlayer
 
             var player = new Player();
             var songs = CreateSongs(out min, out max, ref total);
-            var sortList = new List<Song>();
-            sortList = songs;
 
             Console.WriteLine($"Total duration: " + total + " max duration: " + max + " min duration: " + min);
 
@@ -113,9 +111,7 @@ namespace AudioPlayer
 
                     case "SortT":
                     {
-                        sortList = player.SortByTitle(sortList);
-                        player.playlist.Songs.Clear();
-                        player.playlist.Songs = sortList;
+                        player.playlist.Songs = player.SortByTitle(player.playlist.Songs);
                         player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
@@ -143,6 +139,13 @@ namespace AudioPlayer
                             if (player.playlist.Songs[i].Title == input)
                                 player.playlist.Songs[i].Dislike();
                         }
+                    }
+                    break;
+
+                    case "SortG":
+                    {
+                        player.playlist.Songs = player.SortByGenre(player.playlist.Songs);
+                        player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
                 }
