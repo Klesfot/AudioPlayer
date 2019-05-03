@@ -104,14 +104,14 @@ namespace AudioPlayer
 
                     case "Shuffle":
                     {
-                        player.playlist.Songs = player.Shuffle(player.playlist.Songs);
+                        player.playlist.Songs = player.Shuffle();
                         player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
 
                     case "SortT":
                     {
-                        player.playlist.Songs = player.SortByTitle(player.playlist.Songs);
+                        player.playlist.Songs = player.SortByTitle();
                         player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
@@ -144,7 +144,20 @@ namespace AudioPlayer
 
                     case "SortG":
                     {
-                        player.playlist.Songs = player.SortByGenre(player.playlist.Songs);
+                        Console.WriteLine("Please specify genre");
+                        string input = Console.ReadLine();
+                        int inputInt = 0;
+                        string[] Genre = { "PsyTrance","Electronic","Hardcore","DnB","Drumstep"};
+
+                        for (int i = 0; i < 5; i++)
+                        {
+                            if (input == Genre[i])
+                            {
+                                inputInt = i;
+                            }
+                        }
+
+                        player.playlist.Songs = player.FilterByGenre(inputInt);
                         player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ExtensionMethods;
 
 namespace AudioPlayer
 {
@@ -234,39 +235,25 @@ namespace AudioPlayer
             }
         }
 
-
-        Random rand = new Random();
-        public List<Song> Shuffle(List<Song> songs)
+        
+        public List<Song> Shuffle()
         {
-            var newSongs = new List<Song>();
-
-            for (int i = songs.Count - 1; i >= 0; i--)
-            {
-                var r = rand.Next(i + 1);
-                var temp = songs[i];
-                songs[i] = songs[r];
-                songs[r] = temp;
-                newSongs.Add(songs[i]);
-            }
-            return newSongs;
+            this.playlist.Songs = this.playlist.Songs.Shuffle();
+            return this.playlist.Songs;
         }
 
 
-        public List<Song> SortByTitle(List<Song> songs)
+        public List<Song> SortByTitle()
         {
-            var tempNameList = new List<String>();
-            List<Song> newSongList = songs.OrderBy(o=>o.Title).ToList();
-
-            return newSongList;
+            this.playlist.Songs = this.playlist.Songs.SortByTitle();
+            return this.playlist.Songs;
         }
 
 
-        public List<Song> SortByGenre(List<Song> songs)
+        public List<Song> FilterByGenre(int input)
         {
-            var tempNameList = new List<String>();
-            List<Song> newSongList = songs.OrderBy(o=>(int)o.Genre).ToList();
-
-            return newSongList;
+            this.playlist.Songs = this.playlist.Songs.FilterByGenre(input);
+            return this.playlist.Songs;
         }
 
 
