@@ -223,13 +223,15 @@ namespace AudioPlayer
         {
             for (int i = 0; i < songs.Capacity; i++)
             {
+                (var duration, var title, var artist) = songs[i];
+
                 Genre genre = (Genre)songs[i].Genre;
                 playlist.Songs.Add(songs[i]);
 
-                songs[i].Title = CutToDots(songs[i].Title);
+                songs[i].Title = CutToDots(title);
 
-                Console.WriteLine("Added song: " + " " + songs[i].Title + " " + songs[i].Artist.Name + 
-                                                   " " + songs[i].Duration + " " + genre);
+                Console.WriteLine("Added song: " + " " + title + " " + artist.Name + 
+                                                   " " + duration + " " + genre);
             }
         }
 
