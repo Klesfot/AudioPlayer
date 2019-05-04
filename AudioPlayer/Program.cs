@@ -12,13 +12,13 @@ namespace AudioPlayer
     {
         static void Main(string[] args)
         {
-            int min, max, total = 0; 
+            int min, max, total = 0;
 
             Song song2 = CreateNamedSong("Election");
 
             Artist Artist3 = new Artist("Xi");
             Song song3 = CreateSong("Zauberkugel", Artist3.Name, 3000);
-            
+
             Artist Artist2 = AddArtist("Infected mushroom");
             Artist Artist1 = AddArtist();
             Album Album1 = AddAlbum("Seventh moon", "1994");
@@ -96,7 +96,7 @@ namespace AudioPlayer
                     }
                     break;
 
-                    case "AddArr":
+                    case "Add":
                     {
                         player.Add(songs);
                     }
@@ -147,7 +147,7 @@ namespace AudioPlayer
                         Console.WriteLine("Please specify genre");
                         string input = Console.ReadLine();
                         int inputInt = 0;
-                        string[] Genre = { "PsyTrance","Electronic","Hardcore","DnB","Drumstep"};
+                        string[] Genre = { "PsyTrance", "Electronic", "Hardcore", "DnB", "Drumstep" };
 
                         for (int i = 0; i < 5; i++)
                         {
@@ -159,6 +159,32 @@ namespace AudioPlayer
 
                         player.playlist.Songs = player.FilterByGenre(inputInt);
                         player.PrintPlaylist(player.playlist.Songs);
+                    }
+                    break;
+
+                    case "Test":
+                    {
+                        Console.WriteLine("Artist, duration, title");
+                        string input = Console.ReadLine();
+                        string[] inputArr = input.Split(',');
+
+                        int duration = 0;
+                        string title = "";
+                        Artist artist = new Artist();
+
+                        for (int i = 0; i < inputArr.Length; i++)
+                        {
+                            if (i == 0)
+                                artist.Name = inputArr[i];
+
+                            if (i == 1)
+                                duration = Convert.ToInt32(inputArr[i]);
+
+                            if (i == 2)
+                                title = inputArr[i];
+                        }
+
+                        player.Add(CreateTestSong(artist, duration, title));
                     }
                     break;
                 }
@@ -193,7 +219,20 @@ namespace AudioPlayer
         }
 
 
-		private static Song CreateDefaultSong()
+        private static Song CreateTestSong(Artist artist, int duration, string title)
+        {
+            var song = new Song
+            {
+                Artist = artist,
+                Duration = duration,
+                Title = title
+            };
+
+            return song;
+        }
+
+
+        private static Song CreateDefaultSong()
         {
             Random rand = new Random();
             var song1 = new Song();
@@ -208,7 +247,7 @@ namespace AudioPlayer
         private static Song CreateNamedSong(string name)
         {
             Random rand = new Random();
-            
+
             var song2 = new Song();
             song2.Title = name;
             song2.Duration = rand.Next(3001);

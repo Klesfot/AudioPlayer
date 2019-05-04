@@ -197,6 +197,7 @@ namespace AudioPlayer
         {
             playlist.Songs.Add(song1);
             Genre genre = (Genre)song1.Genre;
+            song1.Title = CutToDots(song1.Title);
             Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration + " " + genre);
         }
 
@@ -205,8 +206,13 @@ namespace AudioPlayer
         {
             playlist.Songs.Add(song1);
             playlist.Songs.Add(song2);
+
             Genre genre1 = (Genre)song1.Genre;
             Genre genre2 = (Genre)song2.Genre;
+
+            song1.Title = CutToDots(song1.Title);
+            song2.Title = CutToDots(song2.Title);
+
             Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration + " " + genre1);
             Console.WriteLine("Added song: " + " " + song2.Title + " " + song2.Artist.Name + " " + song2.Duration + " " + genre2);
             return null;
@@ -219,6 +225,9 @@ namespace AudioPlayer
             {
                 Genre genre = (Genre)songs[i].Genre;
                 playlist.Songs.Add(songs[i]);
+
+                songs[i].Title = CutToDots(songs[i].Title);
+
                 Console.WriteLine("Added song: " + " " + songs[i].Title + " " + songs[i].Artist.Name + 
                                                    " " + songs[i].Duration + " " + genre);
             }
@@ -229,7 +238,8 @@ namespace AudioPlayer
         {
             Console.WriteLine("Playlist contains following songs: ");
             for (int i = 0; i < songs.Count; i++)
-            {   
+            {
+                songs[i].Title = CutToDots(songs[i].Title);
                 Genre genre = (Genre)songs[i].Genre;
                 Console.WriteLine(songs[i].Artist.Name + " " + songs[i].Title + " " + songs[i].Duration + " " + genre);
             }
@@ -262,7 +272,7 @@ namespace AudioPlayer
             if (color == "green")
             {    
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                Console.WriteLine(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
                                                             " " + playlist.Songs[i].Duration +
                                                             " " + genre);
                 System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
@@ -270,19 +280,27 @@ namespace AudioPlayer
             else if (color == "red")
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                Console.WriteLine(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
                                                             " " + playlist.Songs[i].Duration +
                                                             " " + genre);
                 System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
             }
             else
             {
-                Console.WriteLine(playlist.Songs[i].Title + " " + playlist.Songs[i].Artist.Name +
+                Console.WriteLine(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
                                                             " " + playlist.Songs[i].Duration +
                                                             " " + genre);
                 System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
             }
                 
+        }
+        
+
+        public string CutToDots(string data)
+        {
+            data = data.CutToDots();
+
+            return data;
         }
     }
 }

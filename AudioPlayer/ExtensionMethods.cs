@@ -50,5 +50,17 @@ namespace ExtensionMethods
 
             return newSongsList;
         }
+
+        
+        public static String CutToDots(this String data)
+        {
+            if (data.Length > 14)
+            {
+                data = data.Remove(14);
+                data = data.Insert(14, "...");
+            }
+
+            return data;
+        }
     }
 }
