@@ -10,18 +10,27 @@ namespace AudioPlayer
 {
     class Player
     {
+        public Player(int skin = 0)
+        {
+            this.currentSkin = skin;
+        }
         public enum Genre : int
         {
             PsyTrance = 0,
             Electronic = 1,
             Hardcore = 2,
             DnB = 3,
-            Drumstep = 4
+            Drumstep = 4,
+            NaN = 5
         };
-        
+
         public Playlist playlist = new Playlist();
         private int _maxVolume = 100, _minVolume = 0;
         private int _volume;
+        public int currentSkin = 0;
+
+        public ClassicSkin classicSkin = new ClassicSkin();
+        public DOSSkin dosSkin = new DOSSkin();
 
         public int Volume
         {
@@ -32,10 +41,10 @@ namespace AudioPlayer
 
             set
             {
-                if(value > _maxVolume)
+                if (value > _maxVolume)
                     _volume = _maxVolume;
 
-                else if(value < 0)
+                else if (value < 0)
                     _volume = _minVolume;
 
                 else
@@ -54,10 +63,10 @@ namespace AudioPlayer
         }
 
         bool IsLocked, IsOnLoop;
-        
+
 
         public void Play(bool IsOnLoop = false)
-        {   
+        {
             if (playing == true)
             {
                 if (IsLocked == false)
@@ -86,32 +95,32 @@ namespace AudioPlayer
 
                     else
                     {
-                        for (int l = 0; l < 5; l++)
+                        for (int i = 0; i < 5; i++)
                         {
-                            for (int i = 0; i < playlist.Songs[i].Duration; i++)
+                            Genre genre = (Genre)playlist.Songs[i].Genre;
+                            if (playlist.Songs[i].IsLiked == true)
+                                printSong(i, genre, "green");
+
+                            else if (playlist.Songs[i].IsLiked == false)
                             {
-                                Genre genre = (Genre)playlist.Songs[i].Genre;
-                                if (playlist.Songs[i].IsLiked == true)
-                                    printSong(i, genre, "green");
-
-                                else if (playlist.Songs[i].IsLiked == false)
-                                {
-                                    printSong(i, genre, "red");
-                                }
-
-                                else
-                                {
-                                    printSong(i, genre);
-                                }
+                                printSong(i, genre, "red");
                             }
+
+                            else
+                            {
+                                printSong(i, genre);
+                            }
+
                         }
                     }
                 }
+
                 else
-                    Console.WriteLine("Player is locked, unlock it first");
+                    Render("Player is locked, unlock it first");
             }
+
             else if (playing == false)
-                Console.WriteLine("Player has not started, start it first");
+                Render("Player has not started, start it first");
         }
 
 
@@ -120,12 +129,12 @@ namespace AudioPlayer
             if (IsLocked == false)
             {
                 playing = true;
-                Console.WriteLine("Player has started");
+                Render("Player has started");
             }
 
             else
             {
-                Console.WriteLine("Player is locked, unlock first");
+                Render("Player is locked, unlock first");
             }
 
             return playing;
@@ -137,12 +146,12 @@ namespace AudioPlayer
             if (IsLocked == false)
             {
                 playing = false;
-                Console.WriteLine("Player has stopped");
+                Render("Player has stopped");
             }
 
             else
             {
-                Console.WriteLine("Player is locked, unlock first");
+                Render("Player is locked, unlock first");
 
             }
 
@@ -153,101 +162,72 @@ namespace AudioPlayer
         public void Lock()
         {
             IsLocked = true;
-            Console.WriteLine("Player is locked");
+            Render("Player is locked");
         }
 
 
         public void Unlock()
         {
             IsLocked = false;
-            Console.WriteLine("Player is unlocked");
+            Render("Player is unlocked");
         }
 
 
         public void VolumeUp()
         {
             Volume += 5;
-            Console.WriteLine("Volume is: " + Volume);
+            Render("Volume is: " + Volume);
         }
 
 
         public void VolumeDown()
         {
             Volume -= 5;
-            Console.WriteLine("Volume is: " + Volume);
+            Render("Volume is: " + Volume);
         }
 
 
         public int VolumeChange(int amount)
         {
             Volume = amount;
-            Console.WriteLine("Volume is: " + Volume);
+            Render("Volume is: " + Volume);
 
             return 0;
         }
-
-
-        private void SongsParamsList(params string[] Songs)
-        {
-            Console.WriteLine(Songs);
-        }
-
 
         public void Add(Song song1)
         {
             playlist.Songs.Add(song1);
             Genre genre = (Genre)song1.Genre;
             song1.Title = CutToDots(song1.Title);
-            Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration + " " + genre);
+            Render("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration + " " + genre);
         }
-
-
-        public Song[] Add(Song song1, Song song2)
-        {
-            playlist.Songs.Add(song1);
-            playlist.Songs.Add(song2);
-
-            Genre genre1 = (Genre)song1.Genre;
-            Genre genre2 = (Genre)song2.Genre;
-
-            song1.Title = CutToDots(song1.Title);
-            song2.Title = CutToDots(song2.Title);
-
-            Console.WriteLine("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration + " " + genre1);
-            Console.WriteLine("Added song: " + " " + song2.Title + " " + song2.Artist.Name + " " + song2.Duration + " " + genre2);
-            return null;
-        }
-
 
         public void Add(List<Song> songs)
         {
             for (int i = 0; i < songs.Capacity; i++)
             {
                 (var duration, var title, var artist) = songs[i];
-
                 Genre genre = (Genre)songs[i].Genre;
                 playlist.Songs.Add(songs[i]);
-
                 songs[i].Title = CutToDots(title);
-
-                Console.WriteLine("Added song: " + " " + title + " " + artist.Name + 
-                                                   " " + duration + " " + genre);
+                Render("Added song: " + " " + title + " " + artist.Name +
+                                        " " + duration + " " + genre);
             }
         }
 
 
         public void PrintPlaylist(List<Song> songs)
         {
-            Console.WriteLine("Playlist contains following songs: ");
             for (int i = 0; i < songs.Count; i++)
             {
                 songs[i].Title = CutToDots(songs[i].Title);
                 Genre genre = (Genre)songs[i].Genre;
-                Console.WriteLine(songs[i].Artist.Name + " " + songs[i].Title + " " + songs[i].Duration + " " + genre);
+                Render(songs[i].Artist.Name + " " + songs[i].Title + " " + songs[i].Duration + " " + genre);
             }
         }
 
-        
+
         public List<Song> Shuffle()
         {
             this.playlist.Songs = this.playlist.Songs.Shuffle();
@@ -272,37 +252,81 @@ namespace AudioPlayer
         public void printSong(int i, Genre genre, string color = "white")
         {
             if (color == "green")
-            {    
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
+            {
+                Render(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
                                                             " " + playlist.Songs[i].Duration +
-                                                            " " + genre);
+                                                            " " + genre, ConsoleColor.Green);
                 System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
             }
             else if (color == "red")
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
+                Render(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
                                                             " " + playlist.Songs[i].Duration +
-                                                            " " + genre);
+                                                            " " + genre, ConsoleColor.Red);
                 System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
             }
             else
             {
-                Console.WriteLine(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
-                                                            " " + playlist.Songs[i].Duration +
-                                                            " " + genre);
+                Render(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
+                                                           " " + playlist.Songs[i].Duration +
+                                                           " " + genre);
                 System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
             }
-                
+
         }
-        
 
         public string CutToDots(string data)
         {
             data = data.CutToDots();
-
             return data;
+        }
+
+        public void Render(string text, ConsoleColor fgColor = ConsoleColor.White, ConsoleColor bgColor = ConsoleColor.Black)
+        {
+            if (currentSkin == 1)
+                bgColor = ConsoleColor.Blue;
+
+            NewScreen();
+            if (currentSkin == 0)
+            {
+                classicSkin.Render(text, bgColor, fgColor);
+            }
+
+            else if (currentSkin == 1)
+            {
+                dosSkin.Render(text, bgColor, fgColor);
+            }
+        }
+
+        public void Render(string[] text, ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
+        {
+            if (currentSkin == 1)
+                bgColor = ConsoleColor.Blue;
+
+            NewScreen();
+            if (currentSkin == 0)
+            {
+                classicSkin.Render(text, bgColor, fgColor);
+            }
+
+            else if (currentSkin == 1)
+            {
+                dosSkin.Render(text, bgColor, fgColor);
+            }
+        }
+
+
+        public void NewScreen()
+        {
+            if (currentSkin == 0)
+            {
+                classicSkin.NewScreen();
+            }
+
+            else if (currentSkin == 1)
+            {
+                dosSkin.NewScreen();
+            }
         }
     }
 }

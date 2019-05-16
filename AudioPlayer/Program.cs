@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static System.Console;
 
 namespace AudioPlayer
@@ -14,45 +10,26 @@ namespace AudioPlayer
         {
             int min, max, total = 0;
 
-            Song song2 = CreateNamedSong("Election");
-
-            Artist Artist3 = new Artist("Xi");
-            Song song3 = CreateSong("Zauberkugel", Artist3.Name, 3000);
-
-            Artist Artist2 = AddArtist("Infected mushroom");
-            Artist Artist1 = AddArtist();
-            Album Album1 = AddAlbum("Seventh moon", "1994");
-            Album Album2 = AddAlbum();
-            Album Album3 = AddAlbum("1080", "Spicy ooze");
-
-            Console.WriteLine("Artist 2 is: " + " " + Artist2.Name + " " + Artist2.Nickname + " " + Artist3.Country);
-            Console.WriteLine("Artist 1 is: " + " " + Artist1.Name + " " + Artist1.Nickname + " " + Artist1.Country);
-            Console.WriteLine("Album 1 is: " + " " + Album1.Name + " " + Album1.Year);
-            Console.WriteLine("Album 2 is: " + " " + Album2.Name + " " + Album2.Year);
-            Console.WriteLine("Album 3 is: " + " " + Album3.Name + " " + Album3.Year);
-
             var player = new Player();
             var songs = CreateSongs(out min, out max, ref total);
-
-            Console.WriteLine($"Total duration: " + total + " max duration: " + max + " min duration: " + min);
 
             while (true)
             {
                 switch (ReadLine())
                 {
-                    case "U":
+                    case "u":
                     {
                         player.VolumeUp();
                     }
                     break;
 
-                    case "D":
+                    case "d":
                     {
                         player.VolumeDown();
                     }
                     break;
 
-                    case "Pt":
+                    case "Loop":
                     {
                         player.Play(true);
                     }
@@ -66,7 +43,7 @@ namespace AudioPlayer
 
                     case "Volume":
                     {
-                        Console.WriteLine("Specify volume: ");
+                        player.Render("Specify volume: ");
                         int inputAmount = Convert.ToInt32(Console.ReadLine());
                         player.VolumeChange(inputAmount);
                     }
@@ -118,7 +95,7 @@ namespace AudioPlayer
 
                     case "+":
                     {
-                        Console.WriteLine("Please specify the title of a song in current playlist that you wish to like");
+                        player.Render("Please specify the title of a song in current playlist that you wish to like");
                         var input = Console.ReadLine();
 
                         for (int i = 0; i < player.playlist.Songs.Count; i++)
@@ -131,7 +108,7 @@ namespace AudioPlayer
 
                     case "-":
                     {
-                        Console.WriteLine("Please specify the the title of a song in current playlist that you wish to like");
+                        player.Render("Please specify the the title of a song in current playlist that you wish to like");
                         var input = Console.ReadLine();
 
                         for (int i = 0; i < player.playlist.Songs.Count; i++)
@@ -144,7 +121,7 @@ namespace AudioPlayer
 
                     case "SortG":
                     {
-                        Console.WriteLine("Please specify genre");
+                        player.Render("Please specify genre");
                         string input = Console.ReadLine();
                         int inputInt = 0;
                         string[] Genre = { "PsyTrance", "Electronic", "Hardcore", "DnB", "Drumstep" };
@@ -164,7 +141,7 @@ namespace AudioPlayer
 
                     case "Test":
                     {
-                        Console.WriteLine("Artist, duration, title");
+                        player.Render("Artist, duration, title");
                         string input = Console.ReadLine();
                         string[] inputArr = input.Split(',');
 
@@ -187,6 +164,20 @@ namespace AudioPlayer
                         player.Add(CreateTestSong(artist, duration, title));
                     }
                     break;
+
+                    case "s 0":
+                    {
+                        player.currentSkin = 0;
+                        player.classicSkin.NewScreen();
+                    }
+                    break;
+
+                    case "s 1":
+                    {
+                        player.currentSkin = 1;
+                        player.dosSkin.NewScreen();
+                    }
+                    break;
                 }
             }
         }
@@ -200,11 +191,12 @@ namespace AudioPlayer
 
             for (int i = 0; i < songs.Capacity; i++)
             {
-                var song1 = new Song();
-                song1.Title = "Song" + i;
-                song1.Duration = rand.Next(3001);
-                song1.Artist = new Artist();
-                song1.Genre = rand.Next(5);
+                var title = "Song" + i;
+                var duration = rand.Next(3001);
+                var artist = new Artist();
+                var genre = rand.Next(5);
+                var song1 = new Song(duration, title, artist, genre);
+
                 songs.Add(song1);
                 TotalDuration += song1.Duration;
                 MinDuration = song1.Duration < MinDuration ? song1.Duration : MinDuration;
@@ -221,50 +213,8 @@ namespace AudioPlayer
 
         private static Song CreateTestSong(Artist artist, int duration, string title)
         {
-            var song = new Song
-            {
-                Artist = artist,
-                Duration = duration,
-                Title = title
-            };
-
+            var song = new Song(duration, title, artist);
             return song;
-        }
-
-
-        private static Song CreateDefaultSong()
-        {
-            Random rand = new Random();
-            var song1 = new Song();
-
-            song1.Title = Convert.ToString(rand.Next(1000));
-            song1.Duration = rand.Next(3001);
-            song1.Artist = new Artist(Convert.ToString(rand.Next(3001)));
-            return song1;
-        }
-
-
-        private static Song CreateNamedSong(string name)
-        {
-            Random rand = new Random();
-
-            var song2 = new Song();
-            song2.Title = name;
-            song2.Duration = rand.Next(3001);
-            song2.Artist = new Artist(Convert.ToString(rand.Next(3001)));
-            return song2;
-        }
-
-
-        private static Song CreateSong(string name, string artistName, int duration)
-        {
-            Random rand = new Random();
-
-            var song3 = new Song();
-            song3.Title = name;
-            song3.Duration = duration;
-            song3.Artist = new Artist(artistName);
-            return song3;
         }
 
 

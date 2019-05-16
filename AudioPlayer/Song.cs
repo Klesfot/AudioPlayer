@@ -30,6 +30,14 @@ namespace AudioPlayer
         }
 
 
+        public Song(int duration = 0, string title = "Nothing Here", Artist artist = null, int genre = 5)
+        {
+            this.Duration = duration;
+            this.Title = title;
+            this.Artist = artist;
+            this.Genre = (int)genre;
+        }
+
         public void Deconstruct(out int duration, out string title, out Artist artist)
         {
             duration = Duration;

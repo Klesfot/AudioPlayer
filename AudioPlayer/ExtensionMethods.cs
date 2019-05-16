@@ -39,7 +39,6 @@ namespace ExtensionMethods
 
         public static List<Song> FilterByGenre(this List<Song> songs, int genre)
         {
-            var tempGenreList = new List<int>();
             var newSongsList = new List<Song>();
 
             for (int i = 0; i < songs.Count; i++)
