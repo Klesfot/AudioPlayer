@@ -10,7 +10,9 @@ namespace AudioPlayer
         {
             int min, max, total = 0;
 
-            var player = new Player();
+            var defaultSkin = new ColorSkin();
+
+            var player = new Player(defaultSkin);
             var songs = CreateSongs(out min, out max, ref total);
 
             while (true)
@@ -43,7 +45,7 @@ namespace AudioPlayer
 
                     case "Volume":
                     {
-                        player.Render("Specify volume: ");
+                        player.currentSkin.Render("Specify volume: ");
                         int inputAmount = Convert.ToInt32(Console.ReadLine());
                         player.VolumeChange(inputAmount);
                     }
@@ -95,7 +97,7 @@ namespace AudioPlayer
 
                     case "+":
                     {
-                        player.Render("Please specify the title of a song in current playlist that you wish to like");
+                        player.currentSkin.Render("Please specify the title of a song in current playlist that you wish to like");
                         var input = Console.ReadLine();
 
                         for (int i = 0; i < player.playlist.Songs.Count; i++)
@@ -108,7 +110,7 @@ namespace AudioPlayer
 
                     case "-":
                     {
-                        player.Render("Please specify the the title of a song in current playlist that you wish to like");
+                        player.currentSkin.Render("Please specify the the title of a song in current playlist that you wish to like");
                         var input = Console.ReadLine();
 
                         for (int i = 0; i < player.playlist.Songs.Count; i++)
@@ -121,7 +123,7 @@ namespace AudioPlayer
 
                     case "SortG":
                     {
-                        player.Render("Please specify genre");
+                        player.currentSkin.Render("Please specify genre");
                         string input = Console.ReadLine();
                         int inputInt = 0;
                         string[] Genre = { "PsyTrance", "Electronic", "Hardcore", "DnB", "Drumstep" };
@@ -141,7 +143,7 @@ namespace AudioPlayer
 
                     case "Test":
                     {
-                        player.Render("Artist, duration, title");
+                        player.currentSkin.Render("Artist, duration, title");
                         string input = Console.ReadLine();
                         string[] inputArr = input.Split(',');
 
@@ -167,15 +169,17 @@ namespace AudioPlayer
 
                     case "s 0":
                     {
-                        player.currentSkin = 0;
-                        player.classicSkin.NewScreen();
+                        var tempSkin = new ColorSkin();
+                        player.currentSkin = tempSkin;
+                        player.currentSkin.NewScreen();
                     }
                     break;
 
                     case "s 1":
                     {
-                        player.currentSkin = 1;
-                        player.dosSkin.NewScreen();
+                        var tempSkin = new ColorSkin(ConsoleColor.Blue);
+                        player.currentSkin = tempSkin;
+                        player.currentSkin.NewScreen();
                     }
                     break;
                 }

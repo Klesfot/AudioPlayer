@@ -6,67 +6,48 @@ using System.Threading.Tasks;
 
 namespace AudioPlayer
 {
-    public abstract class Skin
+    public interface ISkin
     {
-        public abstract void NewScreen();
+        void NewScreen();
 
-        public abstract void Render(string text, ConsoleColor backgroundColor, ConsoleColor foregroundColor);
+        void Render(string text, ConsoleColor color);
 
-        public abstract void Render(string[] text, ConsoleColor backgroundColor, ConsoleColor foregroundColor);
+        void Render(string[] text, ConsoleColor color);
     }
 
-    public class ClassicSkin : Skin
+    public class ColorSkin : ISkin
     {
-        public override void NewScreen()
+        ConsoleColor BGColor;
+        ConsoleColor FGColor;
+
+        public ColorSkin(ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
         {
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.White;
+            this.BGColor = bgColor;
+            this.FGColor = fgColor;
         }
 
-        public override void Render(string text, ConsoleColor backgroundColor = ConsoleColor.Black, ConsoleColor foregroundColor = ConsoleColor.White)
+        public void NewScreen()
         {
-            Console.BackgroundColor = backgroundColor;
-            Console.ForegroundColor = foregroundColor;
+            Console.BackgroundColor = BGColor;
+            Console.Clear();
+            Console.ForegroundColor = FGColor;
+        }
+
+        public void Render(string text, ConsoleColor customFGColor = ConsoleColor.White)
+        {
+            Console.BackgroundColor = BGColor;
+            Console.ForegroundColor = customFGColor;
             Console.WriteLine(text);
         }
 
-        public override void Render(string[] text, ConsoleColor backgroundColor = ConsoleColor.Black, ConsoleColor foregroundColor = ConsoleColor.White)
+        public void Render(string[] text, ConsoleColor customFGColor = ConsoleColor.White)
         {
-            Console.BackgroundColor = backgroundColor;
-            Console.ForegroundColor = foregroundColor;
+            Console.BackgroundColor = BGColor;
+            Console.ForegroundColor = customFGColor;
 
             for (int i = 0; i < text.Length; i++)
             {
-                Console.Write(i + " ");
-            }
-        }
-    }
-
-    public class DOSSkin : Skin
-    {
-        public override void NewScreen()
-        {
-            Console.BackgroundColor = ConsoleColor.Blue;
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        public override void Render(string text, ConsoleColor backgroundColor = ConsoleColor.Blue, ConsoleColor foregroundColor = ConsoleColor.White)
-        {
-            Console.BackgroundColor = backgroundColor;
-            Console.ForegroundColor = foregroundColor;
-            Console.WriteLine(text);
-        }
-
-        public override void Render(string[] text, ConsoleColor backgroundColor = ConsoleColor.Blue, ConsoleColor foregroundColor = ConsoleColor.White)
-        {
-            Console.BackgroundColor = backgroundColor;
-            Console.ForegroundColor = foregroundColor;
-
-            for (int i = 0; i < text.Length; i++)
-            {
-                Console.Write(i + " ");
+                Console.Write(text[i] + " ");
             }
         }
     }
