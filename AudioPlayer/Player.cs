@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ExtensionMethods;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace AudioPlayer
 {
@@ -193,25 +192,28 @@ namespace AudioPlayer
             return 0;
         }
 
-        public void Add(Song song1)
+        
+        public void Load(string path)
         {
-            playlist.Songs.Add(song1);
-            Genre genre = (Genre)song1.Genre;
-            song1.Title = CutToDots(song1.Title);
-            currentSkin.Render("Added song: " + " " + song1.Title + " " + song1.Artist.Name + " " + song1.Duration + " " + genre);
+            List<Song> songs = new List<Song>();
+            DirectoryInfo dir = new DirectoryInfo(path);
+
+            foreach (var item in dir.EnumerateFiles())
+            {
+                Song song = new Song((int)item.Length / 1000,
+                                          item.Name,
+                                          item.FullName);
+                song.Artist = new Artist("Test artist", "None", "Sweden");
+                songs.Add(song);
+            }
+
+            playlist.Songs.AddRange(songs);
         }
 
-        public void Add(List<Song> songs)
+
+        public void Clear()
         {
-            for (int i = 0; i < songs.Capacity; i++)
-            {
-                (var duration, var title, var artist) = songs[i];
-                Genre genre = (Genre)songs[i].Genre;
-                playlist.Songs.Add(songs[i]);
-                songs[i].Title = CutToDots(title);
-                currentSkin.Render("Added song: " + " " + title + " " + artist.Name +
-                                        " " + duration + " " + genre);
-            }
+            playlist.Songs.Clear();
         }
 
 
@@ -276,6 +278,51 @@ namespace AudioPlayer
         {
             data = data.CutToDots();
             return data;
+        }
+
+
+        public void SaveCurrentPlaylist(string path = @"D:\Songs\SavedPlaylist.xml")
+        {
+            List<Song> songs = playlist.Songs;
+            string result = "";
+            foreach (var item in songs)
+            {
+                string temp;
+                XmlSerializer ser = new XmlSerializer(item.GetType());
+                using (var sww = new StringWriter())
+                {
+                    using (XmlWriter writer = XmlWriter.Create(sww))
+                    {
+                        ser.Serialize(writer, item);
+                        temp = sww.ToString();
+                        result += temp;
+                    }
+                }
+            }
+
+            FileInfo file = new FileInfo(path);
+
+            if (file.Exists)
+                file.Delete();
+            else if (!file.Exists)
+                file.Create();
+            StreamWriter sw = file.AppendText();
+            sw.WriteLine(result);
+        }
+
+
+        public void LoadPlaylist(string path = @"D:\Songs\SavedPlaylist.xml")
+        {
+            List<Song> temp;
+            XmlSerializer ser = new XmlSerializer(typeof(Song));
+            string xmlString = File.ReadAllText(path);
+
+            using (TextReader reader = new StringReader(xmlString))
+            {
+                temp = (List<Song>)ser.Deserialize(reader);
+            }
+
+            playlist.Songs.AddRange(temp);
         }
     }
 }

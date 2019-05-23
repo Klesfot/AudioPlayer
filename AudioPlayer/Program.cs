@@ -4,6 +4,7 @@ using static System.Console;
 using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
+using ExtensionMethods;
 
 namespace AudioPlayer
 {
@@ -16,7 +17,6 @@ namespace AudioPlayer
             var defaultSkin = new ColorSkin();
 
             var player = new Player(defaultSkin);
-            var songs = CreateSongs(out min, out max, ref total);
 
             while (true)
             {
@@ -115,9 +115,17 @@ namespace AudioPlayer
                     }
                     break;
 
-                    case "Add":
+                    case "Load":
                     {
-                        player.Add(songs);
+                        player.currentSkin.Render("Please enter the path to desired directory");
+                        string path = Console.ReadLine();
+                        player.Load(path);
+                    }
+                    break;
+
+                    case "Clear":
+                    {
+                        player.playlist.Songs.ClearAll();
                     }
                     break;
 
@@ -181,32 +189,6 @@ namespace AudioPlayer
                     }
                     break;
 
-                    case "Test":
-                    {
-                        player.currentSkin.Render("Artist, duration, title");
-                        string input = Console.ReadLine();
-                        string[] inputArr = input.Split(',');
-
-                        int duration = 0;
-                        string title = "";
-                        Artist artist = new Artist();
-
-                        for (int i = 0; i < inputArr.Length; i++)
-                        {
-                            if (i == 0)
-                                artist.Name = inputArr[i];
-
-                            if (i == 1)
-                                duration = Convert.ToInt32(inputArr[i]);
-
-                            if (i == 2)
-                                title = inputArr[i];
-                        }
-
-                        player.Add(CreateTestSong(artist, duration, title));
-                    }
-                    break;
-
                     case "s 0":
                     {
                         var tempSkin = new ColorSkin();
@@ -222,45 +204,21 @@ namespace AudioPlayer
                         player.currentSkin.NewScreen();
                     }
                     break;
+
+                    case "SaveP":
+                    {
+                        player.SaveCurrentPlaylist();
+                    }
+                    break;
+
+                    case "LoadP":
+                    {
+                        player.LoadPlaylist();
+                    }
+                    break;
                 }
             }
         }
-
-
-        private static List<Song> CreateSongs(out int min, out int max, ref int total)
-        {
-            Random rand = new Random();
-            List<Song> songs = new List<Song>(5);
-            int MinDuration = int.MaxValue, MaxDuration = int.MinValue, TotalDuration = 0;
-
-            for (int i = 0; i < songs.Capacity; i++)
-            {
-                var title = "Song" + i;
-                var duration = rand.Next(3001);
-                var artist = new Artist();
-                var genre = rand.Next(5);
-                var song1 = new Song(duration, title, artist, genre);
-
-                songs.Add(song1);
-                TotalDuration += song1.Duration;
-                MinDuration = song1.Duration < MinDuration ? song1.Duration : MinDuration;
-                MaxDuration = song1.Duration > MaxDuration ? song1.Duration : MaxDuration;
-            }
-
-            total = TotalDuration;
-            max = MaxDuration;
-            min = MinDuration;
-
-            return songs;
-        }
-
-
-        private static Song CreateTestSong(Artist artist, int duration, string title)
-        {
-            var song = new Song(duration, title, artist);
-            return song;
-        }
-
 
         private static Artist AddArtist(string artistName = "Unknown artist", string artistNick = "N/A", string artistCountry = "N/A")
         {

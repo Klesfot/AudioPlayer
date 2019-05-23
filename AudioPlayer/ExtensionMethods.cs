@@ -50,6 +50,13 @@ namespace ExtensionMethods
             return newSongsList;
         }
 
+
+        public static List<Song> ClearAll(this List<Song> songs)
+        {
+            songs.Clear();
+            return songs;
+        }
+
         
         public static String CutToDots(this String data)
         {
