@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AudioPlayer
 {
-    public class Song
+    public class Song : PlayingItem
     {
         public int Duration;
         public string Title;
@@ -36,6 +36,11 @@ namespace AudioPlayer
             this.Title = title;
             this.Artist = artist;
             this.Genre = (int)genre;
+        }
+
+        public Song()
+        {
+
         }
 
         public void Deconstruct(out int duration, out string title, out Artist artist)

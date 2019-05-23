@@ -8,7 +8,7 @@ using ExtensionMethods;
 
 namespace AudioPlayer
 {
-    class Player
+    class Player: GenericPlayer
     {
         public Player(ColorSkin skin)
         {
@@ -247,7 +247,7 @@ namespace AudioPlayer
         }
 
 
-        public void printSong(int i, Genre genre, string color = "white")
+        public void printSong(int i, Genre genre = Genre.NaN, string color = "white")
         {
             if (color == "green")
             {
@@ -270,7 +270,6 @@ namespace AudioPlayer
                                                            " " + genre);
                 System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
             }
-
         }
 
         public string CutToDots(string data)

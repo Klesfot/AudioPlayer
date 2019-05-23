@@ -16,5 +16,10 @@ namespace AudioPlayer
                       string Country = "-"){
             this.Name = Name;
         }
+
+        public Artist()
+        {
+
+        }
     }
 }

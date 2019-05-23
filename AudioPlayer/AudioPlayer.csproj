@@ -47,6 +47,8 @@
     <Compile Include="Artist.cs" />
     <Compile Include="Band.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="GenericPlayer.cs" />
+    <Compile Include="PlayingItem.cs" />
     <Compile Include="Playlist.cs" />
     <Compile Include="Skin.cs" />
     <Compile Include="Song.cs" />
