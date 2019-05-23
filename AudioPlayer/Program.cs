@@ -216,6 +216,12 @@ namespace AudioPlayer
                         player.LoadPlaylist();
                     }
                     break;
+
+                    case "Exit":
+                    {
+                        player.Dispose();
+                    }
+                    break;
                 }
             }
         }

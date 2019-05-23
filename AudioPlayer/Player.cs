@@ -4,10 +4,11 @@ using ExtensionMethods;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Media;
 
 namespace AudioPlayer
 {
-    class Player: GenericPlayer
+    class Player : GenericPlayer, IDisposable
     {
         public Player(ColorSkin skin)
         {
@@ -26,6 +27,8 @@ namespace AudioPlayer
         public Playlist playlist = new Playlist();
         private int _maxVolume = 100, _minVolume = 0;
         private int _volume;
+        private SoundPlayer currentPlayer;
+        private bool isDisposed = false;
 
         public ColorSkin currentSkin = null;
 
@@ -76,16 +79,25 @@ namespace AudioPlayer
                             if (playlist.Songs[i].IsLiked == true)
                             {
                                 printSong(i, genre, "green");
+                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                truePlayer.PlaySync();
+                                currentPlayer = truePlayer;
                             }
 
                             else if (playlist.Songs[i].IsLiked == false)
                             {
                                 printSong(i, genre, "red");
+                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                truePlayer.PlaySync();
+                                currentPlayer = truePlayer;
                             }
 
                             else
                             {
                                 printSong(i, genre);
+                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                truePlayer.PlaySync();
+                                currentPlayer = truePlayer;
                             }
                         }
                     }
@@ -96,16 +108,27 @@ namespace AudioPlayer
                         {
                             Genre genre = (Genre)playlist.Songs[i].Genre;
                             if (playlist.Songs[i].IsLiked == true)
+                            {
                                 printSong(i, genre, "green");
+                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                truePlayer.PlaySync();
+                                currentPlayer = truePlayer;
+                            }
 
                             else if (playlist.Songs[i].IsLiked == false)
                             {
                                 printSong(i, genre, "red");
+                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                truePlayer.PlaySync();
+                                currentPlayer = truePlayer;
                             }
 
                             else
                             {
                                 printSong(i, genre);
+                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                truePlayer.PlaySync();
+                                currentPlayer = truePlayer;
                             }
 
                         }
@@ -192,7 +215,7 @@ namespace AudioPlayer
             return 0;
         }
 
-        
+
         public void Load(string path)
         {
             List<Song> songs = new List<Song>();
@@ -323,6 +346,22 @@ namespace AudioPlayer
             }
 
             playlist.Songs.AddRange(temp);
+        }
+
+
+        ~Player()
+        {
+            if (isDisposed == false)
+                Dispose();
+        }
+
+
+        public void Dispose()
+        {
+            currentSkin = null;
+            playlist.Dispose();
+            isDisposed = true;
+            GC.SuppressFinalize(this);
         }
     }
 }
