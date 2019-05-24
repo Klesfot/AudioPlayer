@@ -308,36 +308,30 @@ namespace AudioPlayer
         {
             List<Song> songs = playlist.Songs;
             string result = "";
-            foreach (var item in songs)
+            string temp;
+
+            XmlSerializer ser = new XmlSerializer(songs.GetType());
+
+            using (var sww = new StringWriter())
             {
-                string temp;
-                XmlSerializer ser = new XmlSerializer(item.GetType());
-                using (var sww = new StringWriter())
+                using (XmlWriter writer = XmlWriter.Create(sww))
                 {
-                    using (XmlWriter writer = XmlWriter.Create(sww))
-                    {
-                        ser.Serialize(writer, item);
-                        temp = sww.ToString();
-                        result += temp;
-                    }
+                    ser.Serialize(writer, songs);
+                    temp = sww.ToString();
+                    result += temp;
                 }
+                if (File.Exists(path))
+                    File.Delete(path);
+                else
+                    File.Create(path);
+                File.AppendAllText(path, result);
             }
-
-            FileInfo file = new FileInfo(path);
-
-            if (file.Exists)
-                file.Delete();
-            else if (!file.Exists)
-                file.Create();
-            StreamWriter sw = file.AppendText();
-            sw.WriteLine(result);
         }
-
 
         public void LoadPlaylist(string path = @"D:\Songs\SavedPlaylist.xml")
         {
             List<Song> temp;
-            XmlSerializer ser = new XmlSerializer(typeof(Song));
+            XmlSerializer ser = new XmlSerializer(typeof(List<Song>));
             string xmlString = File.ReadAllText(path);
 
             using (TextReader reader = new StringReader(xmlString))
