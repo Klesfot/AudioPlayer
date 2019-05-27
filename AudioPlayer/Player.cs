@@ -10,8 +10,17 @@ namespace AudioPlayer
 {
     class Player : GenericPlayer, IDisposable
     {
+        readonly SoundPlayer truePlayer;
+
         public Player(ColorSkin skin)
         {
+            this.truePlayer = new SoundPlayer();
+            this.currentSkin = skin;
+        }
+
+        public Player(ISkin skin)
+        {
+            this.truePlayer = new SoundPlayer();
             this.currentSkin = skin;
         }
         public enum Genre : int
@@ -25,12 +34,13 @@ namespace AudioPlayer
         };
 
         public Playlist playlist = new Playlist();
-        private int _maxVolume = 100, _minVolume = 0;
+        private readonly int _maxVolume = 100;
+        private readonly int _minVolume = 0;
         private int _volume;
-        private SoundPlayer currentPlayer;
         private bool isDisposed = false;
+        private SoundPlayer currentPlayer;
 
-        public ColorSkin currentSkin = null;
+        public ISkin currentSkin = null;
 
         public int Volume
         {
@@ -79,7 +89,7 @@ namespace AudioPlayer
                             if (playlist.Songs[i].IsLiked == true)
                             {
                                 printSong(i, genre, "green");
-                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
                                 truePlayer.PlaySync();
                                 currentPlayer = truePlayer;
                             }
@@ -87,7 +97,7 @@ namespace AudioPlayer
                             else if (playlist.Songs[i].IsLiked == false)
                             {
                                 printSong(i, genre, "red");
-                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
                                 truePlayer.PlaySync();
                                 currentPlayer = truePlayer;
                             }
@@ -95,7 +105,7 @@ namespace AudioPlayer
                             else
                             {
                                 printSong(i, genre);
-                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
                                 truePlayer.PlaySync();
                                 currentPlayer = truePlayer;
                             }
@@ -104,13 +114,13 @@ namespace AudioPlayer
 
                     else
                     {
-                        for (int i = 0; i < 5; i++)
+                        for (int i = 0; i < playlist.Songs.Count; i++)
                         {
                             Genre genre = (Genre)playlist.Songs[i].Genre;
                             if (playlist.Songs[i].IsLiked == true)
                             {
                                 printSong(i, genre, "green");
-                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
                                 truePlayer.PlaySync();
                                 currentPlayer = truePlayer;
                             }
@@ -118,7 +128,7 @@ namespace AudioPlayer
                             else if (playlist.Songs[i].IsLiked == false)
                             {
                                 printSong(i, genre, "red");
-                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
                                 truePlayer.PlaySync();
                                 currentPlayer = truePlayer;
                             }
@@ -126,7 +136,7 @@ namespace AudioPlayer
                             else
                             {
                                 printSong(i, genre);
-                                SoundPlayer truePlayer = new SoundPlayer(playlist.Songs[i].Path);
+                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
                                 truePlayer.PlaySync();
                                 currentPlayer = truePlayer;
                             }
@@ -352,8 +362,7 @@ namespace AudioPlayer
 
         public void Dispose()
         {
-            currentSkin = null;
-            playlist.Dispose();
+            currentPlayer.Dispose();
             isDisposed = true;
             GC.SuppressFinalize(this);
         }

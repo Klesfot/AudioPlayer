@@ -10,9 +10,9 @@ namespace AudioPlayer
     {
         void NewScreen();
 
-        void Render(string text, ConsoleColor color);
+        void Render(string text, ConsoleColor color = ConsoleColor.White);
 
-        void Render(string[] text, ConsoleColor color);
+        void Render(string[] text, ConsoleColor color = ConsoleColor.White);
     }
 
     public class ColorSkin : ISkin
