@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using static System.Console;
 using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 using ExtensionMethods;
+using System.Collections.Generic;
 
 namespace AudioPlayer
 {
@@ -17,6 +17,42 @@ namespace AudioPlayer
             var defaultSkin = new ColorSkin();
 
             var player = new Player(defaultSkin);
+
+            player.PlayerStartedEvent += (bool isPlaying) =>
+            {
+                Visualise(player, player.PlayingPlaylist);
+            };
+
+            player.PlayerStoppedEvent += (bool isPlaying) =>
+            {
+                List<Song> clearList = new List<Song>();
+                Visualise(player, clearList);
+            };
+
+            player.PlayerLockedEvent += (bool isLocked) =>
+            {
+                Visualise(player, player.PlayingPlaylist);
+            };
+
+            player.PlayerUnlockedEvent += (bool isLocked) =>
+            {
+                Visualise(player, player.PlayingPlaylist);
+            };
+
+            player.VolumeChangedEvent += (int inputAmount) =>
+            {
+                Visualise(player, player.PlayingPlaylist);
+            };
+
+            player.SongStartedEvent += (Song song) =>
+            {
+                Visualise(player, player.PlayingPlaylist);
+            };
+
+            player.SongStoppedEvent += (Song song) =>
+            {
+                Visualise(player, player.PlayingPlaylist);
+            };
 
             while (true)
             {
@@ -79,6 +115,8 @@ namespace AudioPlayer
 
                     case "P":
                     {
+                        if (player.isPlaying == false)
+                            player.Start();
                         player.Play();
                     }
                     break;
@@ -132,20 +170,17 @@ namespace AudioPlayer
                     case "Shuffle":
                     {
                         player.playlist.Songs = player.Shuffle();
-                        player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
 
                     case "SortT":
                     {
                         player.playlist.Songs = player.SortByTitle();
-                        player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
 
                     case "+":
                     {
-                        player.currentSkin.Render("Please specify the title of a song in current playlist that you wish to like");
                         var input = Console.ReadLine();
 
                         for (int i = 0; i < player.playlist.Songs.Count; i++)
@@ -185,7 +220,6 @@ namespace AudioPlayer
                         }
 
                         player.playlist.Songs = player.FilterByGenre(inputInt);
-                        player.PrintPlaylist(player.playlist.Songs);
                     }
                     break;
 
@@ -226,6 +260,36 @@ namespace AudioPlayer
             }
         }
 
+
+        private static void Visualise(Player player, List<Song> songs)
+        {
+            PrintCurrentPlaylist(player, songs);
+            if (player.isPlaying == false)
+                player.currentSkin.Render("Now playing: ");
+            else
+                player.currentSkin.Render($"Now playing: {player.PlayingSong.Title}");
+            player.currentSkin.Render("---------------------------------------------------------------------------");
+            player.currentSkin.Render($"Player playing = {player.isPlaying}" + " " + $", volume is: {player.Volume}" + " " + $", player locked = {player.IsLocked}" + " " + $", player is on loop = {player.IsOnLoop}");
+        }
+
+
+        private static void PrintCurrentPlaylist(Player player, List<Song> songs)
+        {
+            player.currentSkin.NewScreen();
+            foreach (var item in songs)
+            {
+                if (item == player.PlayingSong)
+                    player.currentSkin.Render(item.Title.CutToDots() + " " + item.Artist + " " + item.Duration, ConsoleColor.Gray);
+                else if (item.IsLiked == false)
+                    player.currentSkin.Render(item.Title.CutToDots() + " " + item.Artist + " " + item.Duration, ConsoleColor.Red);
+                else if (item.IsLiked == true)
+                    player.currentSkin.Render(item.Title.CutToDots() + " " + item.Artist + " " + item.Duration, ConsoleColor.Green);
+                else
+                    player.currentSkin.Render(item.Title.CutToDots() + " " + item.Artist + " " + item.Duration);
+            }
+        }
+
+
         private static Artist AddArtist(string artistName = "Unknown artist", string artistNick = "N/A", string artistCountry = "N/A")
         {
             Artist artist1 = new Artist();
@@ -254,7 +318,6 @@ namespace AudioPlayer
                 {
                     ser.Serialize(writer, song);
                     temp = sww.ToString();
-                    Console.WriteLine(temp);
                     return temp;
                 }
             }

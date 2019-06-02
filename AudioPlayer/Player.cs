@@ -8,7 +8,7 @@ using System.Media;
 
 namespace AudioPlayer
 {
-    class Player : GenericPlayer, IDisposable
+    class Player: GenericPlayer, IDisposable
     {
         readonly SoundPlayer truePlayer;
 
@@ -23,6 +23,7 @@ namespace AudioPlayer
             this.truePlayer = new SoundPlayer();
             this.currentSkin = skin;
         }
+
         public enum Genre : int
         {
             PsyTrance = 0,
@@ -33,14 +34,28 @@ namespace AudioPlayer
             NaN = 5
         };
 
+
+        public ISkin currentSkin = null;
         public Playlist playlist = new Playlist();
+
+        public event Action<Song> SongStartedEvent;
+        public event Action<Song> SongStoppedEvent;
+        public event Action<List<Song>> SongListChangedEvent;
+        public event Action<int> VolumeChangedEvent;
+        public event Action<bool> PlayerStartedEvent;
+        public event Action<bool> PlayerStoppedEvent;
+        public event Action<bool> PlayerLockedEvent;
+        public event Action<bool> PlayerUnlockedEvent;
+
         private readonly int _maxVolume = 100;
         private readonly int _minVolume = 0;
         private int _volume;
+        private Song _playingSong = new Song();
+        private List<Song> _playingPlaylist = new List<Song>();
         private bool isDisposed = false;
-        private SoundPlayer currentPlayer;
-
-        public ISkin currentSkin = null;
+        private bool _isPlaying = true;
+        private bool _isLocked;
+        private SoundPlayer currentPlayer = new SoundPlayer();
 
         public int Volume
         {
@@ -59,170 +74,193 @@ namespace AudioPlayer
 
                 else
                     _volume = value;
+
+                VolumeChangedEvent?.Invoke(_volume);
             }
         }
 
-        private bool playing = true;
-
-        public bool Playing
+        public Song PlayingSong
         {
             get
             {
-                return playing;
+                return _playingSong;
+            }
+
+            set
+            {
+                _playingSong = value;
+                SongStartedEvent?.Invoke(value);
             }
         }
 
-        bool IsLocked, IsOnLoop;
 
+        public List<Song> PlayingPlaylist
+        {
+            get
+            {
+                return _playingPlaylist;
+            }
+
+            set
+            {
+                _playingPlaylist = value;
+                playlist.Songs = _playingPlaylist;
+                SongListChangedEvent?.Invoke(value);
+            }
+        }
+
+
+        public bool isPlaying
+        {
+            get
+            {
+                return _isPlaying;
+            }
+
+            private set
+            {
+                _isPlaying = value;
+            }
+        }
+
+        public bool IsOnLoop;
+
+        public bool IsLocked
+        {
+            get
+            {
+                return _isLocked;
+            }
+
+            set
+            {
+                _isLocked = value;
+            }
+        }
 
         public void Play(bool IsOnLoop = false)
         {
-            if (playing == true)
+            if (isPlaying == true)
             {
                 if (IsLocked == false)
                 {
                     if (IsOnLoop == false)
                     {
-                        for (int i = 0; i < playlist.Songs.Count; i++)
+                        Start();
+                        for (int i = 0; i < PlayingPlaylist.Count; i++)
                         {
-                            Genre genre = (Genre)playlist.Songs[i].Genre;
-                            if (playlist.Songs[i].IsLiked == true)
+                            Start();
+                            if (PlayingPlaylist[i].IsLiked == true)
                             {
-                                printSong(i, genre, "green");
-                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
-                                truePlayer.PlaySync();
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
                                 currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
                             }
 
-                            else if (playlist.Songs[i].IsLiked == false)
+                            else if (PlayingPlaylist[i].IsLiked == false)
                             {
-                                printSong(i, genre, "red");
-                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
-                                truePlayer.PlaySync();
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
                                 currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
                             }
 
                             else
                             {
-                                printSong(i, genre);
-                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
-                                truePlayer.PlaySync();
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
                                 currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
                             }
+
+                            truePlayer.PlaySync();
+                            Stop();
                         }
                     }
 
                     else
                     {
-                        for (int i = 0; i < playlist.Songs.Count; i++)
+
+                        for (int i = 0; i < PlayingPlaylist.Count; i++)
                         {
-                            Genre genre = (Genre)playlist.Songs[i].Genre;
-                            if (playlist.Songs[i].IsLiked == true)
+                            Start();
+                            if (PlayingPlaylist[i].IsLiked == true)
                             {
-                                printSong(i, genre, "green");
-                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
-                                truePlayer.PlaySync();
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
                                 currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
                             }
 
-                            else if (playlist.Songs[i].IsLiked == false)
+                            else if (PlayingPlaylist[i].IsLiked == false)
                             {
-                                printSong(i, genre, "red");
-                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
-                                truePlayer.PlaySync();
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
                                 currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
                             }
 
                             else
                             {
-                                printSong(i, genre);
-                                this.truePlayer.SoundLocation = playlist.Songs[i].Path;
-                                truePlayer.PlaySync();
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
                                 currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
                             }
 
+                            truePlayer.PlaySync();
+                            Stop();
                         }
                     }
                 }
-
-                else
-                    currentSkin.Render("Player is locked, unlock it first");
             }
-
-            else if (playing == false)
-                currentSkin.Render("Player has not started, start it first");
         }
 
 
-        public bool Start()
+        public void Start()
         {
             if (IsLocked == false)
             {
-                playing = true;
-                currentSkin.Render("Player has started");
+                isPlaying = true;
+                PlayerStartedEvent?.Invoke(isPlaying);
             }
-
-            else
-            {
-                currentSkin.Render("Player is locked, unlock first");
-            }
-
-            return playing;
         }
 
 
-        public bool Stop()
+        public void Stop()
         {
             if (IsLocked == false)
             {
-                playing = false;
-                currentSkin.Render("Player has stopped");
+                isPlaying = false;
+                PlayerStoppedEvent?.Invoke(isPlaying);
             }
-
-            else
-            {
-                currentSkin.Render("Player is locked, unlock first");
-
-            }
-
-            return playing;
         }
 
 
         public void Lock()
         {
             IsLocked = true;
-            currentSkin.Render("Player is locked");
+            PlayerLockedEvent?.Invoke(IsLocked);
         }
 
 
         public void Unlock()
         {
             IsLocked = false;
-            currentSkin.Render("Player is unlocked");
+            PlayerUnlockedEvent?.Invoke(IsLocked);
         }
 
 
         public void VolumeUp()
         {
             Volume += 5;
-            currentSkin.Render("Volume is: " + Volume);
         }
 
 
         public void VolumeDown()
         {
             Volume -= 5;
-            currentSkin.Render("Volume is: " + Volume);
         }
 
 
-        public int VolumeChange(int amount)
+        public void VolumeChange(int amount)
         {
             Volume = amount;
-            currentSkin.Render("Volume is: " + Volume);
-
-            return 0;
         }
 
 
@@ -241,70 +279,35 @@ namespace AudioPlayer
             }
 
             playlist.Songs.AddRange(songs);
+            PlayingPlaylist = playlist.Songs;
         }
 
 
         public void Clear()
         {
-            playlist.Songs.Clear();
-        }
-
-
-        public void PrintPlaylist(List<Song> songs)
-        {
-            for (int i = 0; i < songs.Count; i++)
-            {
-                songs[i].Title = CutToDots(songs[i].Title);
-                Genre genre = (Genre)songs[i].Genre;
-                currentSkin.Render(songs[i].Artist.Name + " " + songs[i].Title + " " + songs[i].Duration + " " + genre);
-            }
+            PlayingPlaylist.Clear();
+            SongListChangedEvent?.Invoke(PlayingPlaylist);
         }
 
 
         public List<Song> Shuffle()
         {
-            this.playlist.Songs = this.playlist.Songs.Shuffle();
-            return this.playlist.Songs;
+            this.PlayingPlaylist = this.PlayingPlaylist.Shuffle();
+            return this.PlayingPlaylist;
         }
 
 
         public List<Song> SortByTitle()
         {
-            this.playlist.Songs = this.playlist.Songs.SortByTitle();
-            return this.playlist.Songs;
+            this.PlayingPlaylist = this.PlayingPlaylist.SortByTitle();
+            return this.PlayingPlaylist;
         }
 
 
         public List<Song> FilterByGenre(int input)
         {
-            this.playlist.Songs = this.playlist.Songs.FilterByGenre(input);
-            return this.playlist.Songs;
-        }
-
-
-        public void printSong(int i, Genre genre = Genre.NaN, string color = "white")
-        {
-            if (color == "green")
-            {
-                currentSkin.Render(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
-                                                            " " + playlist.Songs[i].Duration +
-                                                            " " + genre, ConsoleColor.Green);
-                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
-            }
-            else if (color == "red")
-            {
-                currentSkin.Render(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
-                                                            " " + playlist.Songs[i].Duration +
-                                                            " " + genre, ConsoleColor.Red);
-                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
-            }
-            else
-            {
-                currentSkin.Render(CutToDots(playlist.Songs[i].Title) + " " + playlist.Songs[i].Artist.Name +
-                                                           " " + playlist.Songs[i].Duration +
-                                                           " " + genre);
-                System.Threading.Thread.Sleep(playlist.Songs[i].Duration);
-            }
+            this.PlayingPlaylist = this.PlayingPlaylist.FilterByGenre(input);
+            return this.PlayingPlaylist;
         }
 
         public string CutToDots(string data)
@@ -316,7 +319,7 @@ namespace AudioPlayer
 
         public void SaveCurrentPlaylist(string path = @"D:\Songs\SavedPlaylist.xml")
         {
-            List<Song> songs = playlist.Songs;
+            List<Song> songs = PlayingPlaylist;
             string result = "";
             string temp;
 
@@ -362,9 +365,12 @@ namespace AudioPlayer
 
         public void Dispose()
         {
-            currentPlayer.Dispose();
-            isDisposed = true;
-            GC.SuppressFinalize(this);
+            if (isDisposed == false)
+            {
+                isDisposed = true;
+                currentPlayer.Dispose();
+                GC.SuppressFinalize(this);
+            }
         }
     }
 }
