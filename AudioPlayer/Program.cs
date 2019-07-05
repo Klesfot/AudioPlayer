@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using System.IO;
 using ExtensionMethods;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AudioPlayer
 {
@@ -53,6 +54,7 @@ namespace AudioPlayer
             {
                 Visualise(player, player.PlayingPlaylist);
             };
+            
 
             while (true)
             {
@@ -109,7 +111,7 @@ namespace AudioPlayer
 
                     case "Loop":
                     {
-                        player.Play(true);
+                        player.PlayAsync(true);
                     }
                     break;
 
@@ -117,7 +119,7 @@ namespace AudioPlayer
                     {
                         if (player.isPlaying == false)
                             player.Start();
-                        player.Play();
+                        player.PlayAsync();
                     }
                     break;
 
