@@ -5,11 +5,10 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Media;
-using System.Threading.Tasks;
 
 namespace AudioPlayer
 {
-    class Player : GenericPlayer, IDisposable
+    class Player: GenericPlayer, IDisposable
     {
         readonly SoundPlayer truePlayer;
 
@@ -47,7 +46,6 @@ namespace AudioPlayer
         public event Action<bool> PlayerStoppedEvent;
         public event Action<bool> PlayerLockedEvent;
         public event Action<bool> PlayerUnlockedEvent;
-
 
         private readonly int _maxVolume = 100;
         private readonly int _minVolume = 0;
@@ -140,80 +138,77 @@ namespace AudioPlayer
             }
         }
 
-        public async Task PlayAsync(bool isOnLoop = false)
+        public void Play(bool IsOnLoop = false)
         {
-            await Task.Run(() =>
+            if (isPlaying == true)
             {
-               if (isPlaying == true)
-               {
-                   if (IsLocked == false)
-                   {
-                       if (IsOnLoop == false)
-                       {
-                           Start();
-                           for (int i = 0; i < PlayingPlaylist.Count; i++)
-                           {
-                               Start();
-                               if (PlayingPlaylist[i].IsLiked == true)
-                               {
-                                   this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                   currentPlayer = truePlayer;
-                                   PlayingSong = PlayingPlaylist[i];
-                               }
+                if (IsLocked == false)
+                {
+                    if (IsOnLoop == false)
+                    {
+                        Start();
+                        for (int i = 0; i < PlayingPlaylist.Count; i++)
+                        {
+                            Start();
+                            if (PlayingPlaylist[i].IsLiked == true)
+                            {
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
+                            }
 
-                               else if (PlayingPlaylist[i].IsLiked == false)
-                               {
-                                   this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                   currentPlayer = truePlayer;
-                                   PlayingSong = PlayingPlaylist[i];
-                               }
+                            else if (PlayingPlaylist[i].IsLiked == false)
+                            {
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
+                            }
 
-                               else
-                               {
-                                   this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                   currentPlayer = truePlayer;
-                                   PlayingSong = PlayingPlaylist[i];
-                               }
+                            else
+                            {
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
+                            }
 
-                               truePlayer.PlaySync();
-                               Stop();
-                           }
-                       }
+                            truePlayer.PlaySync();
+                            Stop();
+                        }
+                    }
 
-                       else
-                       {
+                    else
+                    {
 
-                           for (int i = 0; i < PlayingPlaylist.Count; i++)
-                           {
-                               Start();
-                               if (PlayingPlaylist[i].IsLiked == true)
-                               {
-                                   this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                   currentPlayer = truePlayer;
-                                   PlayingSong = PlayingPlaylist[i];
-                               }
+                        for (int i = 0; i < PlayingPlaylist.Count; i++)
+                        {
+                            Start();
+                            if (PlayingPlaylist[i].IsLiked == true)
+                            {
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
+                            }
 
-                               else if (PlayingPlaylist[i].IsLiked == false)
-                               {
-                                   this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                   currentPlayer = truePlayer;
-                                   PlayingSong = PlayingPlaylist[i];
-                               }
+                            else if (PlayingPlaylist[i].IsLiked == false)
+                            {
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
+                            }
 
-                               else
-                               {
-                                   this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                   currentPlayer = truePlayer;
-                                   PlayingSong = PlayingPlaylist[i];
-                               }
+                            else
+                            {
+                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = truePlayer;
+                                PlayingSong = PlayingPlaylist[i];
+                            }
 
-                               truePlayer.PlaySync();
-                               Stop();
-                           }
-                       }
-                   }
-               }
-           });
+                            truePlayer.PlaySync();
+                            Stop();
+                        }
+                    }
+                }
+            }
         }
 
 
