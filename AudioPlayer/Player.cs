@@ -5,22 +5,22 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Media;
+using NAudio;
+using NAudio.Wave;
 
 namespace AudioPlayer
 {
     class Player: GenericPlayer, IDisposable
     {
-        readonly SoundPlayer truePlayer;
-
         public Player(ColorSkin skin)
         {
-            this.truePlayer = new SoundPlayer();
+            this.wavPlayer = new SoundPlayer();
             this.currentSkin = skin;
         }
 
         public Player(ISkin skin)
         {
-            this.truePlayer = new SoundPlayer();
+            this.wavPlayer = new SoundPlayer();
             this.currentSkin = skin;
         }
 
@@ -34,7 +34,7 @@ namespace AudioPlayer
             NaN = 5
         };
 
-
+        private readonly SoundPlayer wavPlayer;
         public ISkin currentSkin = null;
         public Playlist playlist = new Playlist();
 
@@ -152,26 +152,26 @@ namespace AudioPlayer
                             Start();
                             if (PlayingPlaylist[i].IsLiked == true)
                             {
-                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = truePlayer;
+                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = wavPlayer;
                                 PlayingSong = PlayingPlaylist[i];
                             }
 
                             else if (PlayingPlaylist[i].IsLiked == false)
                             {
-                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = truePlayer;
+                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = wavPlayer;
                                 PlayingSong = PlayingPlaylist[i];
                             }
 
                             else
                             {
-                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = truePlayer;
+                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = wavPlayer;
                                 PlayingSong = PlayingPlaylist[i];
                             }
 
-                            truePlayer.PlaySync();
+                            wavPlayer.PlaySync();
                             Stop();
                         }
                     }
@@ -184,26 +184,26 @@ namespace AudioPlayer
                             Start();
                             if (PlayingPlaylist[i].IsLiked == true)
                             {
-                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = truePlayer;
+                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = wavPlayer;
                                 PlayingSong = PlayingPlaylist[i];
                             }
 
                             else if (PlayingPlaylist[i].IsLiked == false)
                             {
-                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = truePlayer;
+                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = wavPlayer;
                                 PlayingSong = PlayingPlaylist[i];
                             }
 
                             else
                             {
-                                this.truePlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = truePlayer;
+                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
+                                currentPlayer = wavPlayer;
                                 PlayingSong = PlayingPlaylist[i];
                             }
 
-                            truePlayer.PlaySync();
+                            wavPlayer.PlaySync();
                             Stop();
                         }
                     }
