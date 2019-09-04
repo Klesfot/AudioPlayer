@@ -4,7 +4,7 @@ using ExtensionMethods;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Media;
+using System.Threading.Tasks;
 using NAudio;
 using NAudio.Wave;
 
@@ -12,15 +12,8 @@ namespace AudioPlayer
 {
     class Player: GenericPlayer, IDisposable
     {
-        public Player(ColorSkin skin)
-        {
-            this.wavPlayer = new SoundPlayer();
-            this.currentSkin = skin;
-        }
-
         public Player(ISkin skin)
         {
-            this.wavPlayer = new SoundPlayer();
             this.currentSkin = skin;
         }
 
@@ -34,7 +27,7 @@ namespace AudioPlayer
             NaN = 5
         };
 
-        private readonly SoundPlayer wavPlayer;
+        WaveOut wavPlayer = new WaveOut();
         public ISkin currentSkin = null;
         public Playlist playlist = new Playlist();
 
@@ -55,7 +48,6 @@ namespace AudioPlayer
         private bool isDisposed = false;
         private bool _isPlaying = true;
         private bool _isLocked;
-        private SoundPlayer currentPlayer = new SoundPlayer();
 
         public int Volume
         {
@@ -144,71 +136,42 @@ namespace AudioPlayer
             {
                 if (IsLocked == false)
                 {
-                    if (IsOnLoop == false)
+                    if (IsOnLoop)
                     {
+                        //TODO: loop play, handle exception
                         Start();
                         for (int i = 0; i < PlayingPlaylist.Count; i++)
                         {
-                            Start();
-                            if (PlayingPlaylist[i].IsLiked == true)
-                            {
-                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = wavPlayer;
-                                PlayingSong = PlayingPlaylist[i];
-                            }
-
-                            else if (PlayingPlaylist[i].IsLiked == false)
-                            {
-                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = wavPlayer;
-                                PlayingSong = PlayingPlaylist[i];
-                            }
-
-                            else
-                            {
-                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = wavPlayer;
-                                PlayingSong = PlayingPlaylist[i];
-                            }
-
-                            wavPlayer.PlaySync();
-                            Stop();
+                           Task playSong = Task.Run(() =>
+                           {
+                               PlaySong(i);
+                           });
                         }
+                        Stop();
                     }
 
                     else
                     {
-
+                        Start();
                         for (int i = 0; i < PlayingPlaylist.Count; i++)
                         {
-                            Start();
-                            if (PlayingPlaylist[i].IsLiked == true)
+                            Task playSong = Task.Run(() =>
                             {
-                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = wavPlayer;
-                                PlayingSong = PlayingPlaylist[i];
-                            }
-
-                            else if (PlayingPlaylist[i].IsLiked == false)
-                            {
-                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = wavPlayer;
-                                PlayingSong = PlayingPlaylist[i];
-                            }
-
-                            else
-                            {
-                                this.wavPlayer.SoundLocation = PlayingPlaylist[i].Path;
-                                currentPlayer = wavPlayer;
-                                PlayingSong = PlayingPlaylist[i];
-                            }
-
-                            wavPlayer.PlaySync();
-                            Stop();
+                                PlaySong(i);
+                            });
                         }
+                        Stop();
                     }
                 }
             }
+        }
+
+        
+        public async void PlaySong(int i)
+        {
+            Mp3FileReader mp3Reader = new Mp3FileReader(PlayingPlaylist[i].Path);
+            wavPlayer.Init(mp3Reader);
+            wavPlayer.Play();
         }
 
 
@@ -368,7 +331,7 @@ namespace AudioPlayer
             if (isDisposed == false)
             {
                 isDisposed = true;
-                currentPlayer.Dispose();
+                wavPlayer.Dispose();
                 GC.SuppressFinalize(this);
             }
         }
