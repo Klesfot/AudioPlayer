@@ -22,8 +22,8 @@ namespace AudioPlayer
 
         public ColorSkin(ConsoleColor bgColor = ConsoleColor.Black, ConsoleColor fgColor = ConsoleColor.White)
         {
-            this.BGColor = bgColor;
-            this.FGColor = fgColor;
+            BGColor = bgColor;
+            FGColor = fgColor;
         }
 
         public void NewScreen()

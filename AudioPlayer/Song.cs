@@ -33,11 +33,11 @@ namespace AudioPlayer
 
         public Song(int duration = 0, string title = "Nothing Here", string path = "", Artist artist = null, int genre = 5)
         {
-            this.Duration = duration;
-            this.Title = title;
-            this.Artist = artist;
-            this.Genre = (int)genre;
-            this.Path = path;
+            Duration = duration;
+            Title = title;
+            Artist = artist;
+            Genre = (int)genre;
+            Path = path;
         }
 
 

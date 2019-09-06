@@ -5,17 +5,18 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
-using NAudio;
+using System.Timers;
 using NAudio.Wave;
 
 namespace AudioPlayer
 {
-    class Player: GenericPlayer, IDisposable
+    class Player : GenericPlayer, IDisposable
     {
         public Player(ISkin skin)
         {
-            this.currentSkin = skin;
+            currentSkin = skin;
         }
+
 
         public enum Genre : int
         {
@@ -27,7 +28,8 @@ namespace AudioPlayer
             NaN = 5
         };
 
-        WaveOut wavPlayer = new WaveOut();
+
+        readonly WaveOut waveOutDevice = new WaveOut();
         public ISkin currentSkin = null;
         public Playlist playlist = new Playlist();
 
@@ -39,6 +41,8 @@ namespace AudioPlayer
         public event Action<bool> PlayerStoppedEvent;
         public event Action<bool> PlayerLockedEvent;
         public event Action<bool> PlayerUnlockedEvent;
+        public event Action<bool> PlaybackAbortedEvent;
+
 
         private readonly int _maxVolume = 100;
         private readonly int _minVolume = 0;
@@ -46,8 +50,11 @@ namespace AudioPlayer
         private Song _playingSong = new Song();
         private List<Song> _playingPlaylist = new List<Song>();
         private bool isDisposed = false;
+        private bool isOnLoop = false;
         private bool _isPlaying = true;
         private bool _isLocked;
+        private bool _isAborted;
+
 
         public int Volume
         {
@@ -70,6 +77,7 @@ namespace AudioPlayer
                 VolumeChangedEvent?.Invoke(_volume);
             }
         }
+
 
         public Song PlayingSong
         {
@@ -102,7 +110,7 @@ namespace AudioPlayer
         }
 
 
-        public bool isPlaying
+        public bool IsPlaying
         {
             get
             {
@@ -115,7 +123,19 @@ namespace AudioPlayer
             }
         }
 
-        public bool IsOnLoop;
+
+        public bool IsOnLoop
+        {
+            get
+            {
+                return isOnLoop;
+            }
+            private set
+            {
+                isOnLoop = value;
+            }
+        }
+
 
         public bool IsLocked
         {
@@ -130,48 +150,82 @@ namespace AudioPlayer
             }
         }
 
-        public void Play(bool IsOnLoop = false)
+
+        public bool IsAborted
         {
-            if (isPlaying == true)
+            get
+            {
+                return _isAborted;
+            }
+
+            set
+            {
+                if (value)
+                {
+                    PlaybackAbortedEvent?.Invoke(true);
+                }
+
+                else if (!value)
+                {
+                    PlayerStartedEvent?.Invoke(true);
+                }
+                _isAborted = value;
+            }
+        }
+        //ISSUE: Memory overflow
+        public async void Play(bool IsOnLoop = false)
+        {
+            if (IsPlaying == true)
             {
                 if (IsLocked == false)
                 {
                     if (IsOnLoop)
                     {
-                        //TODO: loop play, handle exception
-                        Start();
-                        for (int i = 0; i < PlayingPlaylist.Count; i++)
+                        //TODO: memory management
+                        while (IsOnLoop)
                         {
-                           Task playSong = Task.Run(() =>
-                           {
-                               PlaySong(i);
-                           });
+                            await PlayMP3Song(0).ConfigureAwait(false);
                         }
-                        Stop();
                     }
 
                     else
                     {
-                        Start();
-                        for (int i = 0; i < PlayingPlaylist.Count; i++)
+                        for (int songIndex = 0; songIndex < PlayingPlaylist.Count; songIndex++)
                         {
-                            Task playSong = Task.Run(() =>
-                            {
-                                PlaySong(i);
-                            });
+                            await PlayMP3Song(songIndex).ConfigureAwait(false);
                         }
-                        Stop();
                     }
                 }
             }
         }
 
-        
-        public async void PlaySong(int i)
+        public Task PlayMP3Song(int songIndex)
         {
-            Mp3FileReader mp3Reader = new Mp3FileReader(PlayingPlaylist[i].Path);
-            wavPlayer.Init(mp3Reader);
-            wavPlayer.Play();
+            return Task.Run(() =>
+            {
+                Task.Run(() =>
+                {
+                    var timer = new System.Timers.Timer(100);
+                    timer.Elapsed += delegate (Object source, ElapsedEventArgs elapsed1)
+                    {
+                        PlaybackAbortedEvent += (bool Abortion) =>
+                        {
+                            waveOutDevice.Stop();
+                            PlayerStoppedEvent?.Invoke(true);
+                        };
+                    };
+                    timer.AutoReset = true;
+                    timer.Enabled = true;
+                });
+
+                Start();
+                
+                PlayingSong = PlayingPlaylist[songIndex];
+                Mp3FileReader mp3Reader = new Mp3FileReader(PlayingPlaylist[songIndex].Path);
+                waveOutDevice.Init(mp3Reader);
+                waveOutDevice.Play();
+                Stop();
+            });
         }
 
 
@@ -179,8 +233,8 @@ namespace AudioPlayer
         {
             if (IsLocked == false)
             {
-                isPlaying = true;
-                PlayerStartedEvent?.Invoke(isPlaying);
+                IsPlaying = true;
+                PlayerStartedEvent?.Invoke(IsPlaying);
             }
         }
 
@@ -189,8 +243,9 @@ namespace AudioPlayer
         {
             if (IsLocked == false)
             {
-                isPlaying = false;
-                PlayerStoppedEvent?.Invoke(isPlaying);
+                IsPlaying = false;
+                PlayingSong = new Song();
+                PlayerStoppedEvent?.Invoke(IsPlaying);
             }
         }
 
@@ -255,22 +310,22 @@ namespace AudioPlayer
 
         public List<Song> Shuffle()
         {
-            this.PlayingPlaylist = this.PlayingPlaylist.Shuffle();
-            return this.PlayingPlaylist;
+            PlayingPlaylist = PlayingPlaylist.Shuffle();
+            return PlayingPlaylist;
         }
 
 
         public List<Song> SortByTitle()
         {
-            this.PlayingPlaylist = this.PlayingPlaylist.SortByTitle();
-            return this.PlayingPlaylist;
+            PlayingPlaylist = PlayingPlaylist.SortByTitle();
+            return PlayingPlaylist;
         }
 
 
         public List<Song> FilterByGenre(int input)
         {
-            this.PlayingPlaylist = this.PlayingPlaylist.FilterByGenre(input);
-            return this.PlayingPlaylist;
+            PlayingPlaylist = PlayingPlaylist.FilterByGenre(input);
+            return PlayingPlaylist;
         }
 
         public string CutToDots(string data)
@@ -319,6 +374,12 @@ namespace AudioPlayer
         }
 
 
+        public void Abort()
+        {
+            IsAborted = true;
+        }
+
+
         ~Player()
         {
             if (isDisposed == false)
@@ -331,7 +392,7 @@ namespace AudioPlayer
             if (isDisposed == false)
             {
                 isDisposed = true;
-                wavPlayer.Dispose();
+                waveOutDevice.Dispose();
                 GC.SuppressFinalize(this);
             }
         }

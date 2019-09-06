@@ -12,250 +12,260 @@ namespace AudioPlayer
     {
         static void Main(string[] args)
         {
-            int min, max, total = 0;
-
             var defaultSkin = new ColorSkin();
 
-            var player = new Player(defaultSkin);
-
-            player.PlayerStartedEvent += (bool isPlaying) =>
+            using (var player = new Player(defaultSkin))
             {
-                Visualise(player, player.PlayingPlaylist);
-            };
-
-            player.PlayerStoppedEvent += (bool isPlaying) =>
-            {
-                List<Song> clearList = new List<Song>();
-                Visualise(player, clearList);
-            };
-
-            player.PlayerLockedEvent += (bool isLocked) =>
-            {
-                Visualise(player, player.PlayingPlaylist);
-            };
-
-            player.PlayerUnlockedEvent += (bool isLocked) =>
-            {
-                Visualise(player, player.PlayingPlaylist);
-            };
-
-            player.VolumeChangedEvent += (int inputAmount) =>
-            {
-                Visualise(player, player.PlayingPlaylist);
-            };
-
-            player.SongStartedEvent += (Song song) =>
-            {
-                Visualise(player, player.PlayingPlaylist);
-            };
-
-            player.SongStoppedEvent += (Song song) =>
-            {
-                Visualise(player, player.PlayingPlaylist);
-            };
-
-            while (true)
-            {
-                switch (ReadLine())
+                player.PlayerStartedEvent += (bool isPlaying) =>
                 {
-                    case "STX":
-                    {
-                        player.currentSkin.Render("Please input index of a song to serialize to string format: ");
-                        int input = Convert.ToInt32(Console.ReadLine());
-                        SerXML(player.playlist.Songs[input]);
-                    }
-                    break;
+                    Visualise(player, player.PlayingPlaylist);
+                };
 
-                    case "DSTX":
-                    {
-                        player.currentSkin.Render("Please input index of a song to deserialize to string format: ");
-                        int input = Convert.ToInt32(Console.ReadLine());
-                        Song temp = DeSerXML(SerXML(player.playlist.Songs[input]));
-                        Player.Genre genre = (Player.Genre)temp.Genre;
-                        player.currentSkin.Render(temp.Title + " " + temp.Duration + " " + genre);
-                    }
-                    break;
+                player.PlayerStoppedEvent += (bool isPlaying) =>
+                {
+                    List<Song> clearList = new List<Song>();
+                    Visualise(player, clearList);
+                };
 
-                    case "SFX":
-                    {
-                        player.currentSkin.Render("Please input index of a song to serialize to file: ");
-                        int input = Convert.ToInt32(Console.ReadLine());
-                        SerXMLF(player.playlist.Songs[input]);
-                    }
-                    break;
+                player.PlayerLockedEvent += (bool isLocked) =>
+                {
+                    Visualise(player, player.PlayingPlaylist);
+                };
 
-                    case "DSFX":
-                    {
-                        player.currentSkin.Render("Please input index of a song to serialize to file: ");
-                        int input = Convert.ToInt32(Console.ReadLine());
-                        SerXMLF(player.playlist.Songs[input]);
-                        Song temp = DeSerXMLF(@"D:\NewXML.txt");
-                        Player.Genre genre = (Player.Genre)temp.Genre;
-                        player.currentSkin.Render(temp.Title + " " + temp.Duration + " " + genre);
-                    }
-                    break;
+                player.PlayerUnlockedEvent += (bool isLocked) =>
+                {
+                    Visualise(player, player.PlayingPlaylist);
+                };
 
-                    case "u":
-                    {
-                        player.VolumeUp();
-                    }
-                    break;
+                player.VolumeChangedEvent += (int inputAmount) =>
+                {
+                    Visualise(player, player.PlayingPlaylist);
+                };
 
-                    case "d":
-                    {
-                        player.VolumeDown();
-                    }
-                    break;
+                player.SongStartedEvent += (Song song) =>
+                {
+                    Visualise(player, player.PlayingPlaylist);
+                };
 
-                    case "Loop":
-                    {
-                        player.Play(true);
-                    }
-                    break;
+                player.SongStoppedEvent += (Song song) =>
+                {
+                    Visualise(player, player.PlayingPlaylist);
+                };
 
-                    case "P":
+                player.PlaybackAbortedEvent += (bool isAborted) =>
+                {
+                    Visualise(player, player.PlayingPlaylist);
+                };
+
+                while (true)
+                {
+                    switch (ReadLine())
                     {
-                        if (player.isPlaying == false)
+                        case "STX":
+                        {
+                            player.currentSkin.Render("Please input index of a song to serialize to string format: ");
+                            int input = Convert.ToInt32(Console.ReadLine());
+                            SerXML(player.playlist.Songs[input]);
+                        }
+                        break;
+
+                        case "DSTX":
+                        {
+                            player.currentSkin.Render("Please input index of a song to deserialize to string format: ");
+                            int input = Convert.ToInt32(Console.ReadLine());
+                            Song temp = DeSerXML(SerXML(player.playlist.Songs[input]));
+                            Player.Genre genre = (Player.Genre)temp.Genre;
+                            player.currentSkin.Render(temp.Title + " " + temp.Duration + " " + genre);
+                        }
+                        break;
+
+                        case "SFX":
+                        {
+                            player.currentSkin.Render("Please input index of a song to serialize to file: ");
+                            int input = Convert.ToInt32(Console.ReadLine());
+                            SerXMLF(player.playlist.Songs[input]);
+                        }
+                        break;
+
+                        case "DSFX":
+                        {
+                            player.currentSkin.Render("Please input index of a song to serialize to file: ");
+                            int input = Convert.ToInt32(Console.ReadLine());
+                            SerXMLF(player.playlist.Songs[input]);
+                            Song temp = DeSerXMLF(@"D:\NewXML.txt");
+                            Player.Genre genre = (Player.Genre)temp.Genre;
+                            player.currentSkin.Render(temp.Title + " " + temp.Duration + " " + genre);
+                        }
+                        break;
+
+                        case "u":
+                        {
+                            player.VolumeUp();
+                        }
+                        break;
+
+                        case "d":
+                        {
+                            player.VolumeDown();
+                        }
+                        break;
+
+                        case "Loop":
+                        {
+                            player.Play(true);
+                        }
+                        break;
+
+                        case "P":
+                        {
+                            if (player.IsPlaying == false)
+                                player.Start();
+                            player.Play();
+                        }
+                        break;
+
+                        case "Volume":
+                        {
+                            player.currentSkin.Render("Specify volume: ");
+                            int inputAmount = Convert.ToInt32(Console.ReadLine());
+                            player.VolumeChange(inputAmount);
+                        }
+                        break;
+
+                        case "Start":
+                        {
                             player.Start();
-                        player.Play();
-                    }
-                    break;
-
-                    case "Volume":
-                    {
-                        player.currentSkin.Render("Specify volume: ");
-                        int inputAmount = Convert.ToInt32(Console.ReadLine());
-                        player.VolumeChange(inputAmount);
-                    }
-                    break;
-
-                    case "Start":
-                    {
-                        player.Start();
-                    }
-                    break;
-
-                    case "Stop":
-                    {
-                        player.Stop();
-                    }
-                    break;
-
-                    case "Lock":
-                    {
-                        player.Lock();
-                    }
-                    break;
-
-                    case "Unlock":
-                    {
-                        player.Unlock();
-                    }
-                    break;
-
-                    case "Load":
-                    {
-                        player.currentSkin.Render("Please enter the path to desired directory");
-                        string path = Console.ReadLine();
-                        player.Load(path);
-                    }
-                    break;
-
-                    case "Clear":
-                    {
-                        player.playlist.Songs.ClearAll();
-                    }
-                    break;
-
-                    case "Shuffle":
-                    {
-                        player.playlist.Songs = player.Shuffle();
-                    }
-                    break;
-
-                    case "SortT":
-                    {
-                        player.playlist.Songs = player.SortByTitle();
-                    }
-                    break;
-
-                    case "+":
-                    {
-                        var input = Console.ReadLine();
-
-                        for (int i = 0; i < player.playlist.Songs.Count; i++)
-                        {
-                            if (player.playlist.Songs[i].Title == input)
-                                player.playlist.Songs[i].Like();
                         }
-                    }
-                    break;
+                        break;
 
-                    case "-":
-                    {
-                        player.currentSkin.Render("Please specify the the title of a song in current playlist that you wish to like");
-                        var input = Console.ReadLine();
-
-                        for (int i = 0; i < player.playlist.Songs.Count; i++)
+                        case "s":
                         {
-                            if (player.playlist.Songs[i].Title == input)
-                                player.playlist.Songs[i].Dislike();
+                            player.Stop();
                         }
-                    }
-                    break;
+                        break;
 
-                    case "SortG":
-                    {
-                        player.currentSkin.Render("Please specify genre");
-                        string input = Console.ReadLine();
-                        int inputInt = 0;
-                        string[] Genre = { "PsyTrance", "Electronic", "Hardcore", "DnB", "Drumstep" };
-
-                        for (int i = 0; i < 5; i++)
+                        case "a":
                         {
-                            if (input == Genre[i])
+                            player.Abort();
+                        }
+                        break;
+
+                        case "Lock":
+                        {
+                            player.Lock();
+                        }
+                        break;
+
+                        case "Unlock":
+                        {
+                            player.Unlock();
+                        }
+                        break;
+
+                        case "Load":
+                        {
+                            player.currentSkin.Render("Please enter the path to desired directory");
+                            string path = Console.ReadLine();
+                            player.Load(path);
+                        }
+                        break;
+
+                        case "Clear":
+                        {
+                            player.playlist.Songs.ClearAll();
+                        }
+                        break;
+
+                        case "Shuffle":
+                        {
+                            player.playlist.Songs = player.Shuffle();
+                        }
+                        break;
+
+                        case "SortT":
+                        {
+                            player.playlist.Songs = player.SortByTitle();
+                        }
+                        break;
+
+                        case "+":
+                        {
+                            var input = Console.ReadLine();
+
+                            for (int i = 0; i < player.playlist.Songs.Count; i++)
                             {
-                                inputInt = i;
+                                if (player.playlist.Songs[i].Title == input)
+                                    player.playlist.Songs[i].Like();
                             }
                         }
+                        break;
 
-                        player.playlist.Songs = player.FilterByGenre(inputInt);
-                    }
-                    break;
+                        case "-":
+                        {
+                            player.currentSkin.Render("Please specify the the title of a song in current playlist that you wish to like");
+                            var input = Console.ReadLine();
 
-                    case "s 0":
-                    {
-                        var tempSkin = new ColorSkin();
-                        player.currentSkin = tempSkin;
-                        player.currentSkin.NewScreen();
-                    }
-                    break;
+                            for (int i = 0; i < player.playlist.Songs.Count; i++)
+                            {
+                                if (player.playlist.Songs[i].Title == input)
+                                    player.playlist.Songs[i].Dislike();
+                            }
+                        }
+                        break;
 
-                    case "s 1":
-                    {
-                        var tempSkin = new ColorSkin(ConsoleColor.Blue);
-                        player.currentSkin = tempSkin;
-                        player.currentSkin.NewScreen();
-                    }
-                    break;
+                        case "SortG":
+                        {
+                            player.currentSkin.Render("Please specify genre");
+                            string input = Console.ReadLine();
+                            int inputInt = 0;
+                            string[] Genre = { "PsyTrance", "Electronic", "Hardcore", "DnB", "Drumstep" };
 
-                    case "SaveP":
-                    {
-                        player.SaveCurrentPlaylist();
-                    }
-                    break;
+                            for (int i = 0; i < 5; i++)
+                            {
+                                if (input == Genre[i])
+                                {
+                                    inputInt = i;
+                                }
+                            }
 
-                    case "LoadP":
-                    {
-                        player.LoadPlaylist();
-                    }
-                    break;
+                            player.playlist.Songs = player.FilterByGenre(inputInt);
+                        }
+                        break;
 
-                    case "Exit":
-                    {
-                        player.Dispose();
+                        case "s 0":
+                        {
+                            var tempSkin = new ColorSkin();
+                            player.currentSkin = tempSkin;
+                            player.currentSkin.NewScreen();
+                        }
+                        break;
+
+                        case "s 1":
+                        {
+                            var tempSkin = new ColorSkin(ConsoleColor.Blue);
+                            player.currentSkin = tempSkin;
+                            player.currentSkin.NewScreen();
+                        }
+                        break;
+
+                        case "SaveP":
+                        {
+                            player.SaveCurrentPlaylist();
+                        }
+                        break;
+
+                        case "LoadP":
+                        {
+                            player.LoadPlaylist();
+                        }
+                        break;
+
+                        case "Exit":
+                        {
+                            player.Dispose();
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
@@ -264,12 +274,22 @@ namespace AudioPlayer
         private static void Visualise(Player player, List<Song> songs)
         {
             PrintCurrentPlaylist(player, songs);
-            if (player.isPlaying == false)
-                player.currentSkin.Render("Now playing: ");
-            else
-                player.currentSkin.Render($"Now playing: {player.PlayingSong.Title}");
-            player.currentSkin.Render("---------------------------------------------------------------------------");
-            player.currentSkin.Render($"Player playing = {player.isPlaying}" + " " + $", volume is: {player.Volume}" + " " + $", player locked = {player.IsLocked}" + " " + $", player is on loop = {player.IsOnLoop}");
+            try
+            {
+                if (player.IsPlaying == false && player.PlayingSong == null)
+                    player.currentSkin.Render("Now playing: ");
+                else
+                    player.currentSkin.Render($"Now playing: {player.PlayingSong.Title}");
+                player.currentSkin.Render("---------------------------------------------------------------------------");
+                player.currentSkin.Render($"Player playing = {player.IsPlaying}" + " " + $", volume is: {player.Volume}" + " " + $", player locked = {player.IsLocked}" + " " + $", player is on loop = {player.IsOnLoop}");
+            }
+
+            catch (NullReferenceException)
+            {
+                player.currentSkin.Render($"Now playing: ");
+                player.currentSkin.Render("---------------------------------------------------------------------------");
+                player.currentSkin.Render($"Player playing = {player.IsPlaying}" + " " + $", volume is: {player.Volume}" + " " + $", player locked = {player.IsLocked}" + " " + $", player is on loop = {player.IsOnLoop}");
+            }
         }
 
 
@@ -287,25 +307,6 @@ namespace AudioPlayer
                 else
                     player.currentSkin.Render(item.Title.CutToDots() + " " + item.Artist + " " + item.Duration);
             }
-        }
-
-
-        private static Artist AddArtist(string artistName = "Unknown artist", string artistNick = "N/A", string artistCountry = "N/A")
-        {
-            Artist artist1 = new Artist();
-            artist1.Name = artistName;
-            artist1.Nickname = artistNick;
-            artist1.Country = artistCountry;
-            return artist1;
-        }
-
-
-        private static Album AddAlbum(string albumName = "Unknown album", string albumYear = "-")
-        {
-            Album album1 = new Album();
-            album1.Name = albumName;
-            album1.Year = albumYear;
-            return album1;
         }
 
         private static string SerXML(Song song)
