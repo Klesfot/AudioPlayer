@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Console;
 using AudioPlayer;
+using NAudio.Wave;
 
 namespace ExtensionMethods
 {

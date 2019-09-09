@@ -37,7 +37,7 @@ namespace AudioPlayer
                     Visualise(player, player.PlayingPlaylist);
                 };
 
-                player.VolumeChangedEvent += (int inputAmount) =>
+                player.VolumeChangedEvent += (float inputAmount) =>
                 {
                     Visualise(player, player.PlayingPlaylist);
                 };
@@ -112,7 +112,15 @@ namespace AudioPlayer
 
                         case "Loop":
                         {
+                            if (player.IsPlaying == false)
+                                player.Start();
                             player.Play(true);
+                        }
+                        break;
+
+                        case "-Loop":
+                        {
+                            player.IsOnLoop = false;
                         }
                         break;
 
@@ -124,10 +132,10 @@ namespace AudioPlayer
                         }
                         break;
 
-                        case "Volume":
+                        case "V":
                         {
                             player.currentSkin.Render("Specify volume: ");
-                            int inputAmount = Convert.ToInt32(Console.ReadLine());
+                            float inputAmount = Convert.ToSingle(Console.ReadLine().Replace('.',','));
                             player.VolumeChange(inputAmount);
                         }
                         break;
@@ -140,7 +148,7 @@ namespace AudioPlayer
 
                         case "s":
                         {
-                            player.Stop();
+                            player.Stop(player.currentPlaybackDevice);
                         }
                         break;
 

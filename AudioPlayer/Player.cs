@@ -29,14 +29,14 @@ namespace AudioPlayer
         };
 
 
-        readonly WaveOut waveOutDevice = new WaveOut();
+        public WaveOut currentPlaybackDevice = new WaveOut();
         public ISkin currentSkin = null;
         public Playlist playlist = new Playlist();
 
         public event Action<Song> SongStartedEvent;
         public event Action<Song> SongStoppedEvent;
         public event Action<List<Song>> SongListChangedEvent;
-        public event Action<int> VolumeChangedEvent;
+        public event Action<float> VolumeChangedEvent;
         public event Action<bool> PlayerStartedEvent;
         public event Action<bool> PlayerStoppedEvent;
         public event Action<bool> PlayerLockedEvent;
@@ -44,19 +44,19 @@ namespace AudioPlayer
         public event Action<bool> PlaybackAbortedEvent;
 
 
-        private readonly int _maxVolume = 100;
-        private readonly int _minVolume = 0;
-        private int _volume;
+        private readonly float _maxVolume = 1;
+        private readonly float _minVolume = 0;
         private Song _playingSong = new Song();
         private List<Song> _playingPlaylist = new List<Song>();
         private bool isDisposed = false;
+        private float _volume = 0;
         private bool isOnLoop = false;
         private bool _isPlaying = true;
         private bool _isLocked;
         private bool _isAborted;
 
 
-        public int Volume
+        public float Volume
         {
             get
             {
@@ -66,15 +66,15 @@ namespace AudioPlayer
             set
             {
                 if (value > _maxVolume)
-                    _volume = _maxVolume;
+                    currentPlaybackDevice.Volume = _maxVolume;
 
                 else if (value < 0)
-                    _volume = _minVolume;
+                    currentPlaybackDevice.Volume = _minVolume;
 
                 else
-                    _volume = value;
+                    currentPlaybackDevice.Volume = value;
 
-                VolumeChangedEvent?.Invoke(_volume);
+                VolumeChangedEvent?.Invoke(currentPlaybackDevice.Volume);
             }
         }
 
@@ -130,7 +130,7 @@ namespace AudioPlayer
             {
                 return isOnLoop;
             }
-            private set
+            set
             {
                 isOnLoop = value;
             }
@@ -172,7 +172,8 @@ namespace AudioPlayer
                 _isAborted = value;
             }
         }
-        //ISSUE: Memory overflow
+
+
         public async void Play(bool IsOnLoop = false)
         {
             if (IsPlaying == true)
@@ -181,10 +182,16 @@ namespace AudioPlayer
                 {
                     if (IsOnLoop)
                     {
-                        //TODO: memory management
+                        int index = 0;
+
+                        for (int songIndex = 0; songIndex < PlayingPlaylist.Count; songIndex++)
+                        {
+                            if (PlayingPlaylist[songIndex].Path == PlayingSong.Path)
+                                index = songIndex;
+                        }
                         while (IsOnLoop)
                         {
-                            await PlayMP3Song(0).ConfigureAwait(false);
+                            await PlayMP3Song(index).ConfigureAwait(false);
                         }
                     }
 
@@ -199,32 +206,47 @@ namespace AudioPlayer
             }
         }
 
+
         public Task PlayMP3Song(int songIndex)
         {
             return Task.Run(() =>
             {
-                Task.Run(() =>
+                using (WaveOut waveOut = new WaveOut())
                 {
-                    var timer = new System.Timers.Timer(100);
-                    timer.Elapsed += delegate (Object source, ElapsedEventArgs elapsed1)
-                    {
-                        PlaybackAbortedEvent += (bool Abortion) =>
-                        {
-                            waveOutDevice.Stop();
-                            PlayerStoppedEvent?.Invoke(true);
-                        };
-                    };
-                    timer.AutoReset = true;
-                    timer.Enabled = true;
-                });
+                    currentPlaybackDevice = waveOut;
+                    SchedulePlaybackStateCheck(currentPlaybackDevice);
 
-                Start();
-                
-                PlayingSong = PlayingPlaylist[songIndex];
-                Mp3FileReader mp3Reader = new Mp3FileReader(PlayingPlaylist[songIndex].Path);
-                waveOutDevice.Init(mp3Reader);
-                waveOutDevice.Play();
-                Stop();
+                    Start();
+                    PlayingSong = PlayingPlaylist[songIndex];
+                    using (Mp3FileReader mp3Reader = new Mp3FileReader(PlayingPlaylist[songIndex].Path))
+                    {
+
+                        currentPlaybackDevice.Init(mp3Reader);
+                        currentPlaybackDevice.Play();
+
+                        //That's a way of stopping control flow, if deleted waveout device is overflown with different file reader inputs
+                        //Possibly try event waveOutDevice.PlaybackStopped?
+                        while (currentPlaybackDevice.PlaybackState == PlaybackState.Playing)
+                        {
+                            System.Threading.Thread.Sleep(10);
+                        }
+
+                        Stop(currentPlaybackDevice);
+                        currentPlaybackDevice.Dispose();
+                    }
+                }
+            });
+        }
+
+
+        public Task SchedulePlaybackStateCheck(WaveOut playbackDevice)
+        {
+            return Task.Run(() =>
+            {
+                PlaybackAbortedEvent += (bool isAborted) =>
+                {
+                    playbackDevice.Stop();
+                };
             });
         }
 
@@ -239,12 +261,13 @@ namespace AudioPlayer
         }
 
 
-        public void Stop()
+        public void Stop(WaveOut waveOutDevice)
         {
             if (IsLocked == false)
             {
                 IsPlaying = false;
                 PlayingSong = new Song();
+                waveOutDevice.Stop();
                 PlayerStoppedEvent?.Invoke(IsPlaying);
             }
         }
@@ -276,7 +299,7 @@ namespace AudioPlayer
         }
 
 
-        public void VolumeChange(int amount)
+        public void VolumeChange(float amount)
         {
             Volume = amount;
         }
@@ -392,8 +415,7 @@ namespace AudioPlayer
             if (isDisposed == false)
             {
                 isDisposed = true;
-                waveOutDevice.Dispose();
-                GC.SuppressFinalize(this);
+                currentPlaybackDevice.Dispose();
             }
         }
     }
