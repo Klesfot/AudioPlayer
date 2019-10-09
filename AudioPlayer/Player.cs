@@ -56,6 +56,7 @@ namespace AudioPlayer
         private bool _isAborted;
 
 
+        //TODO: save volume to file
         public float Volume
         {
             get

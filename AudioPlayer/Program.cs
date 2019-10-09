@@ -61,43 +61,6 @@ namespace AudioPlayer
                 {
                     switch (ReadLine())
                     {
-                        case "STX":
-                        {
-                            player.currentSkin.Render("Please input index of a song to serialize to string format: ");
-                            int input = Convert.ToInt32(Console.ReadLine());
-                            SerXML(player.playlist.Songs[input]);
-                        }
-                        break;
-
-                        case "DSTX":
-                        {
-                            player.currentSkin.Render("Please input index of a song to deserialize to string format: ");
-                            int input = Convert.ToInt32(Console.ReadLine());
-                            Song temp = DeSerXML(SerXML(player.playlist.Songs[input]));
-                            Player.Genre genre = (Player.Genre)temp.Genre;
-                            player.currentSkin.Render(temp.Title + " " + temp.Duration + " " + genre);
-                        }
-                        break;
-
-                        case "SFX":
-                        {
-                            player.currentSkin.Render("Please input index of a song to serialize to file: ");
-                            int input = Convert.ToInt32(Console.ReadLine());
-                            SerXMLF(player.playlist.Songs[input]);
-                        }
-                        break;
-
-                        case "DSFX":
-                        {
-                            player.currentSkin.Render("Please input index of a song to serialize to file: ");
-                            int input = Convert.ToInt32(Console.ReadLine());
-                            SerXMLF(player.playlist.Songs[input]);
-                            Song temp = DeSerXMLF(@"D:\NewXML.txt");
-                            Player.Genre genre = (Player.Genre)temp.Genre;
-                            player.currentSkin.Render(temp.Title + " " + temp.Duration + " " + genre);
-                        }
-                        break;
-
                         case "u":
                         {
                             player.VolumeUp();
@@ -314,59 +277,6 @@ namespace AudioPlayer
                     player.currentSkin.Render(item.Title.CutToDots() + " " + item.Artist + " " + item.Duration, ConsoleColor.Green);
                 else
                     player.currentSkin.Render(item.Title.CutToDots() + " " + item.Artist + " " + item.Duration);
-            }
-        }
-
-        private static string SerXML(Song song)
-        {
-            string temp;
-            XmlSerializer ser = new XmlSerializer(song.GetType());
-            using (var sww = new StringWriter())
-            {
-                using (XmlWriter writer = XmlWriter.Create(sww))
-                {
-                    ser.Serialize(writer, song);
-                    temp = sww.ToString();
-                    return temp;
-                }
-            }
-        }
-
-
-        private static Song DeSerXML(string xmlString)
-        {
-            Song temp;
-            XmlSerializer ser = new XmlSerializer(typeof(Song));
-
-            using (TextReader reader = new StringReader(xmlString))
-            {
-                temp = (Song)ser.Deserialize(reader);
-                return temp;
-            }
-        }
-
-
-        private static string SerXMLF(Song song)
-        {
-            string path = @"D:\NewXML.txt";
-            if (File.Exists(path))
-                File.Delete(path);
-            else if (!File.Exists(path))
-                File.Create(path);
-            File.AppendAllText(path, SerXML(song));
-            return path;
-        }
-
-        private static Song DeSerXMLF(string path)
-        {
-            Song temp;
-            XmlSerializer ser = new XmlSerializer(typeof(Song));
-            string xmlString = File.ReadAllText(path);
-
-            using (TextReader reader = new StringReader(xmlString))
-            {
-                temp = (Song)ser.Deserialize(reader);
-                return temp;
             }
         }
     }
