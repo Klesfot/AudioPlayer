@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using ExtensionMethods;
+using AudioPlayer.lib;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
-using System.Timers;
 using NAudio.Wave;
 
-namespace AudioPlayer
+namespace AudioPlayer.lib.BL
 {
-    class Player : GenericPlayer, IDisposable
-    {
+    class Player : IDisposable
+    { 
         public Player(ISkin skin)
         {
             currentSkin = skin;

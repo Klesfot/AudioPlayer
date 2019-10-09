@@ -47,16 +47,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Album.cs" />
-    <Compile Include="Artist.cs" />
-    <Compile Include="Band.cs" />
-    <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="GenericPlayer.cs" />
-    <Compile Include="PlayingItem.cs" />
-    <Compile Include="Playlist.cs" />
-    <Compile Include="Skin.cs" />
-    <Compile Include="Song.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="lib\BL\Album.cs" />
+    <Compile Include="lib\BL\Artist.cs" />
+    <Compile Include="lib\BL\Band.cs" />
+    <Compile Include="lib\BL\ISkin.cs" />
+    <Compile Include="lib\ExtensionMethods.cs" />
+    <Compile Include="lib\BL\Playlist.cs" />
+    <Compile Include="lib\BL\Skin.cs" />
+    <Compile Include="lib\BL\Song.cs" />
+    <Compile Include="lib\BL\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AudioPlayer
+﻿namespace AudioPlayer.lib.BL
 {
-    public class Song: PlayingItem
+    public class Song
     {
         public int Duration;
         public string Title;

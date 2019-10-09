@@ -1,9 +1,7 @@
 ﻿using System;
 using static System.Console;
-using System.Xml;
-using System.Xml.Serialization;
-using System.IO;
-using ExtensionMethods;
+using AudioPlayer.lib;
+using AudioPlayer.lib.BL;
 using System.Collections.Generic;
 
 namespace AudioPlayer

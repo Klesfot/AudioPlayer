@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AudioPlayer
+namespace AudioPlayer.lib.BL
 {
     class Playlist: IDisposable
     {

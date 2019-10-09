@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Console;
-using AudioPlayer;
-using NAudio.Wave;
+using AudioPlayer.lib.BL;
 
-namespace ExtensionMethods
+namespace AudioPlayer.lib
 {
     public static class Extensions
     {

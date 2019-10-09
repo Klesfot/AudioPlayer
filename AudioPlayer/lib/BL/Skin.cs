@@ -1,20 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AudioPlayer
+namespace AudioPlayer.lib.BL
 {
-    public interface ISkin
-    {
-        void NewScreen();
-
-        void Render(string text, ConsoleColor color = ConsoleColor.White);
-
-        void Render(string[] text, ConsoleColor color = ConsoleColor.White);
-    }
-
     public class ColorSkin : ISkin
     {
         ConsoleColor BGColor;
